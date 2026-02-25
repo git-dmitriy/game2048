@@ -14,9 +14,11 @@
     >
       <GameChip
         v-for="(ch, i) in cl.chips"
-        :key="chipKey(ch, i)"
+        :key="chipKey(ch)"
         ref="chips"
         :animation-time-ms="animationTimeMs"
+        :move-duration-ms="moveDurationMs"
+        :move-easing="moveEasing"
         :chip="ch"
         :size-px="cellSizePx"
       />
@@ -44,6 +46,10 @@ const props = defineProps({
   tabIndex: { type: Number, default: 1 },
   boardSizePx: { type: Number, default: 0 },
   animationTimeMs: { type: Number, default: 150 },
+  /** Длительность анимации движения плиток (мс). По умолчанию = animationTimeMs */
+  moveDurationMs: { type: Number, default: undefined },
+  /** Easing анимации движения (CSS: ease-out, linear, cubic-bezier(...) и т.д.) */
+  moveEasing: { type: String, default: 'ease-out' },
   started: { type: Boolean, default: false }
 })
 
@@ -56,6 +62,11 @@ const boardSizeAutoPx = ref(0)
 const aim = ref(props.sizeAimMap[props.size] ?? 2048)
 const cells = ref(createCellsArray())
 
+/** Уникальный id для каждой плитки при добавлении (чтобы ключ был стабильным до перемещения) */
+let chipIdCounter = 0
+/** Уникальный ключ при каждом перемещении — чтобы Vue создал новый инстанс и сработал enter */
+let moveKeyCounter = 0
+
 function createCellsArray() {
   return Array.from({ length: props.size * props.size }, () => ({ chips: [] }))
 }
@@ -67,8 +78,13 @@ function setCellRef(el, index) {
   }
 }
 
-function chipKey(ch, i) {
-  return ch.value + '-' + i + '-' + (ch.prevRelPos ? 'm' : '')
+/**
+ * Ключ должен меняться при перемещении, иначе Vue переиспользует компонент и enter не вызывается.
+ * При перемещении используем _moveKey (новый инстанс → анимация входа).
+ */
+function chipKey(ch) {
+  if (ch._moveKey != null) return 'move-' + ch._moveKey
+  return 'chip-' + (ch._chipId != null ? ch._chipId : (ch._chipId = ++chipIdCounter))
 }
 
 const boardStyle = computed(() => ({
@@ -150,7 +166,8 @@ function emptyCells() {
 }
 
 function addChip(c) {
-  cells.value[getCellIndex(c)].chips.push({ value: c.value })
+  const chip = { value: c.value, _chipId: ++chipIdCounter }
+  cells.value[getCellIndex(c)].chips.push(chip)
 }
 
 function addChips(chips) {
@@ -170,6 +187,7 @@ function moveChip(from, to) {
     left: fboundRect.left - tboundRect.left,
     top: fboundRect.top - tboundRect.top
   }
+  chip._moveKey = ++moveKeyCounter
   tcell.chips.push(chip)
 }
 

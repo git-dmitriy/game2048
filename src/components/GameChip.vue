@@ -1,11 +1,9 @@
 <template>
-  <Transition :css="false" @enter="enter">
-    <div ref="chipEl" class="chip" :style="style">{{ chip.value }}</div>
-  </Transition>
+  <div ref="chipEl" class="chip" :style="style">{{ chip.value }}</div>
 </template>
 
 <script setup>
-import { computed, watch, nextTick, ref } from 'vue'
+import { computed, watch, nextTick, ref, onMounted } from 'vue'
 
 const fontSizeCoefs = [1, 1, 0.8, 0.65, 0.5, 0.4, 0.35, 0.32]
 const backColors = []
@@ -29,7 +27,11 @@ colors[128] = '#2c3e50'
 const props = defineProps({
   chip: { type: Object, required: true },
   sizePx: { type: Number, required: true },
-  animationTimeMs: { type: Number, default: 150 }
+  animationTimeMs: { type: Number, default: 150 },
+  /** Длительность анимации движения плитки (мс) */
+  moveDurationMs: { type: Number, default: undefined },
+  /** Easing для анимации движения (CSS easing) */
+  moveEasing: { type: String, default: 'ease-out' }
 })
 
 const fontSizePx = computed(() => {
@@ -63,30 +65,48 @@ watch(() => props.chip.value, () => {
     const el = chipEl.value
     if (el) {
       const d = props.animationTimeMs + 'ms'
-      el.style['-webkit-animation'] = el.style.animation = 'chip-value-changed ' + d
+      el.style.animation = 'chip-value-changed ' + d
+      el.style.webkitAnimation = 'chip-value-changed ' + d
       el.style.transition = 'background-color ' + d
-      el.style['-webkit-transition'] = '-webkit-background-color ' + d
+      el.style.webkitTransition = 'background-color ' + d
     }
   })
 })
 
-function enter(el, done) {
-  if (props.chip.prevRelPos) {
-    const p = props.chip.prevRelPos
-    el.style['-webkit-transform'] = el.style.transform = 'translate(' + p.left + 'px,' + p.top + 'px)'
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.style.transition = 'transform ' + props.animationTimeMs + 'ms'
-        el.style['-webkit-transition'] = '-webkit-transform ' + props.animationTimeMs + 'ms'
-        el.style['-webkit-transform'] = el.style.transform = ''
-        setTimeout(done, props.animationTimeMs)
-      })
-    })
-  } else {
-    el.style['-webkit-animation'] = el.style.animation = 'chip-appear ' + props.animationTimeMs + 'ms'
-    setTimeout(done, props.animationTimeMs)
-  }
+function runMoveAnimation(el) {
+  const moveMs = props.moveDurationMs ?? props.animationTimeMs
+  const p = props.chip.prevRelPos
+  const startTransform = 'translate(' + p.left + 'px,' + p.top + 'px) translateZ(0)'
+  const endTransform = 'translate(0, 0) translateZ(0)'
+  const transitionValue = 'transform ' + moveMs + 'ms ' + (props.moveEasing || 'ease-out')
+
+  el.style.transition = 'none'
+  el.style.webkitTransition = 'none'
+  el.style.transform = startTransform
+  el.style.webkitTransform = startTransform
+  void el.offsetHeight
+  el.style.transition = transitionValue
+  el.style.webkitTransition = transitionValue
+  el.style.transform = endTransform
+  el.style.webkitTransform = endTransform
 }
+
+function runAppearAnimation(el) {
+  el.style.animation = 'chip-appear ' + props.animationTimeMs + 'ms'
+  el.style.webkitAnimation = 'chip-appear ' + props.animationTimeMs + 'ms'
+}
+
+onMounted(() => {
+  nextTick(() => {
+    const el = chipEl.value
+    if (!el) return
+    if (props.chip.prevRelPos) {
+      runMoveAnimation(el)
+    } else {
+      runAppearAnimation(el)
+    }
+  })
+})
 </script>
 
 <style scoped>
