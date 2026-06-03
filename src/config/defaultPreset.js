@@ -1,3 +1,5 @@
+import { createGame2048 } from '../lib/game2048.js'
+
 export const defaultPreset = {
     id: 'default',
 
@@ -8,8 +10,14 @@ export const defaultPreset = {
 
     rules: {
         winTileBySize: {
-            3: 256, 4: 2048, 5: 4096, 6: 8192,
-        }, spawnsPerMove: (size) => Math.max(1, size - 3), initialSpawns: (size) => Math.max(2, size - 2),
+            3: 256,
+            4: 2048,
+            5: 4096,
+            6: 8192,
+        },
+        spawnFourProbability: 0.2,
+        spawnsPerMove: (size) => Math.max(1, size - 3),
+        initialSpawns: (size) => Math.max(2, size - 2),
     },
 
     timing: {
@@ -46,6 +54,31 @@ export function buildSizeAimMap(preset) {
         map[Number(size)] = aim
     }
     return map
+}
+
+export function getSpawnsPerMove(preset, size) {
+    const rule = preset.rules.spawnsPerMove
+    return typeof rule === 'function' ? rule(size) : (rule ?? 1)
+}
+
+export function getInitialSpawns(preset, size) {
+    const rule = preset.rules.initialSpawns
+    return typeof rule === 'function' ? rule(size) : (rule ?? 2)
+}
+
+export function getGame2048Options(preset) {
+    const { rules } = preset
+    const options = {
+        spawnFourProbability: rules.spawnFourProbability ?? 0.2,
+    }
+    if (typeof rules.spawnValue === 'function') {
+        options.spawnValue = rules.spawnValue
+    }
+    return options
+}
+
+export function createGame2048FromPreset(preset, size) {
+    return createGame2048(size, getGame2048Options(preset))
 }
 
 export function createPreset(overrides = {}) {

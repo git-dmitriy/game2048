@@ -33,7 +33,6 @@
       <GameBoard
           ref="gameRef"
           :size="size"
-          :size-aim-map="sizeAimMap"
           :listen-own-key-events-only="listenOwnKeyEventsOnly"
           :tab-index="1"
           :board-size-px="boardSizePx"
@@ -82,14 +81,13 @@ import GameOverlay from './components/GameOverlay.vue'
 import GameBoard from './components/GameBoard.vue'
 import GameAward from './components/GameAward.vue'
 import {useGamePreset} from './composables/useGamePreset.js'
-import {buildSizeAimMap, getBoardSizes, getWinTile} from './config/defaultPreset.js'
+import { getBoardSizes, getWinTile } from './config/defaultPreset.js'
 
 const preset = useGamePreset()
 const {board, timing, features, input} = preset
 
 const defBoardSizePx = board.defaultWidthPx
 const defSize = board.defaultSize
-const sizeAimMap = buildSizeAimMap(preset)
 const listenOwnKeyEventsOnly = input.listenKeysOn === 'board'
 
 const awards = reactive({})

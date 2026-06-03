@@ -1,5 +1,5 @@
-export function createSwipeListener(onSwipe) {
-  const sens = 5
+export function createSwipeListener(onSwipe, options = {}) {
+  const sens = options.sensitivity ?? 5
   let st
 
   function onStart(e) {

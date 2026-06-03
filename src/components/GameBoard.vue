@@ -29,9 +29,15 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import GameChip from './GameChip.vue'
-import { createGame2048 } from '../lib/game2048.js'
 import { deferred } from '../lib/deferred.js'
 import { createSwipeListener } from '../lib/swipe.js'
+import { useGamePreset } from '../composables/useGamePreset.js'
+import {
+  createGame2048FromPreset,
+  getInitialSpawns,
+  getSpawnsPerMove,
+  getWinTile,
+} from '../config/defaultPreset.js'
 
 const keyMap = {}
 keyMap[37] = 'left'
@@ -39,9 +45,10 @@ keyMap[38] = 'up'
 keyMap[39] = 'right'
 keyMap[40] = 'down'
 
+const preset = useGamePreset()
+
 const props = defineProps({
   size: { type: Number, required: true },
-  sizeAimMap: { type: Array, required: true },
   listenOwnKeyEventsOnly: { type: Boolean, default: false },
   tabIndex: { type: Number, default: 1 },
   boardSizePx: { type: Number, default: 0 },
@@ -59,7 +66,7 @@ const boardEl = ref(null)
 const cellRefs = ref([])
 const boardSizeAutoPx = ref(0)
 
-const aim = ref(props.sizeAimMap[props.size] ?? 2048)
+const aim = ref(getWinTile(preset, props.size))
 const cells = ref(createCellsArray())
 
 /** Уникальный id для каждой плитки при добавлении (чтобы ключ был стабильным до перемещения) */
@@ -113,7 +120,7 @@ let swipeDetach = null
 
 watch(() => props.size, () => {
   cells.value = createCellsArray()
-  aim.value = props.sizeAimMap[props.size]
+  aim.value = getWinTile(preset, props.size)
   emit('aim-changed', aim.value)
 })
 
@@ -140,7 +147,9 @@ function runKeyboardControl(doGameMove) {
 }
 
 function runTouchControl(doGameMove) {
-  const sw = createSwipeListener((m) => doGameMove(m))
+  const sw = createSwipeListener((m) => doGameMove(m), {
+    sensitivity: preset.input.swipeSensitivity,
+  })
   const el = boardEl.value
   if (el) {
     sw.attach(el)
@@ -226,10 +235,7 @@ function createGameMove(game) {
     boardChanges.consolidations = result.consolidations || []
     newChips.length = 0
     if (result.moves && result.moves.length > 0) {
-      for (let i = Math.max(1, props.size - 3); i > 0; i--) {
-        const chips = game.turn()
-        newChips.push(...chips)
-      }
+      newChips.push(...game.spawnTiles(getSpawnsPerMove(preset, props.size)))
       if (result.scoreInc > 0) {
         emit('score', { score: game.score(), scoreInc: result.scoreInc })
         for (let i = 0; i < boardChanges.consolidations.length; i++) {
@@ -256,11 +262,8 @@ function createGameMove(game) {
 
 function startGame() {
   emptyCells()
-  const game = createGame2048(props.size)
-  for (let i = Math.max(2, props.size - 2); i > 0; i--) {
-    const chips = game.turn()
-    addChips(chips)
-  }
+  const game = createGame2048FromPreset(preset, props.size)
+  addChips(game.spawnTiles(getInitialSpawns(preset, props.size)))
   const doGameMove = createGameMove(game)
   runKeyboardControl(doGameMove)
   runTouchControl(doGameMove)
