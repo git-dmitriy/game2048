@@ -2,12 +2,16 @@
   <div v-if="visible" class="overlay-wrapper">
     <div class="overlay half-white appearing07"></div>
     <div class="overlay game-over appearing">
-      <p>Game over!</p>
+      <p>{{ strings.gameOver }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useStrings } from '../composables/useStrings.js'
+
+const strings = useStrings()
+
 defineProps({
   visible: {type: Boolean, default: false},
 })

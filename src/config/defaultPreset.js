@@ -1,11 +1,14 @@
 import {createGame2048} from '../lib/game2048.js'
 import {defaultTileTheme} from './tileThemes/default.js'
 import {defaultLayoutRatios} from '../composables/useBoardLayout.js'
+import {defaultStrings} from './strings/default.js'
 
 export const defaultPreset = {
     id: 'default',
     theme: 'default',
     tileTheme: defaultTileTheme,
+    strings: defaultStrings,
+    components: {},
 
     board: {
         defaultSize: 4, defaultWidthPx: 420, /** innerWidth < defaultWidthPx * ratio → уменьшаем доску */
@@ -33,7 +36,11 @@ export const defaultPreset = {
     },
 
     features: {
-        awards: true, bestScorePerSize: true, collectAllBanner: true, scoreAnimation: 'gsap',
+        awards: true,
+        bestScorePerSize: true,
+        collectAllBanner: true,
+        scoreAnimation: 'gsap',
+        awardAnimation: 'fly',
     },
 
     persistence: {
@@ -93,6 +100,8 @@ export function createPreset(overrides = {}) {
     return {
         ...defaultPreset, ...overrides,
         tileTheme: overrides.tileTheme ?? defaultPreset.tileTheme,
+        strings: {...defaultPreset.strings, ...overrides.strings},
+        components: {...defaultPreset.components, ...overrides.components},
         board: {...defaultPreset.board, ...overrides.board},
         layout: {
             ...defaultPreset.layout,

@@ -9,7 +9,7 @@
     </div>
     <div class="scores">
       <div class="score">
-        <div class="label">Score</div>
+        <div class="label">{{ strings.score }}</div>
         <div>
           {{ score }}
           <Transition name="score-inc">
@@ -19,7 +19,7 @@
       </div>
       &nbsp;
       <div class="score">
-        <div class="label">Best</div>
+        <div class="label">{{ strings.best }}</div>
         <div>{{ bestScore }}</div>
       </div>
     </div>
@@ -28,6 +28,9 @@
 
 <script setup>
 import {ref} from 'vue'
+import {useStrings} from '../composables/useStrings.js'
+
+const strings = useStrings()
 
 defineProps({
   score: {type: Number, required: true},

@@ -1,7 +1,7 @@
 <template>
   <div class="game-controls">
     <div v-if="!gameStarted" class="size-control">
-      Size:
+      {{ strings.sizeLabel }}
       <template v-for="s in sizes" :key="'size-' + s">
         <input
             :id="'size-radio' + s"
@@ -19,19 +19,23 @@
         class="button"
         @click="$emit('start')"
     >
-      New Game
+      {{ strings.newGame }}
     </button>
     <button
         v-else
         class="button"
         @click="$emit('end')"
     >
-      End
+      {{ strings.end }}
     </button>
   </div>
 </template>
 
 <script setup>
+import { useStrings } from '../composables/useStrings.js'
+
+const strings = useStrings()
+
 defineProps({
   gameStarted: {type: Boolean, required: true},
   sizes: {type: Array, required: true},
