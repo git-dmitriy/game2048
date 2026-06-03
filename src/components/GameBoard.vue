@@ -207,12 +207,18 @@ function consolidateChips(consolidations) {
 function createGameMove(game) {
   const boardChanges = { moves: [], consolidations: [] }
   const newChips = []
+  const moveDuration = props.moveDurationMs ?? props.animationTimeMs
+  /** Не принимаем новый ход, пока не закончится анимация движения текущего хода */
+  let moveCooldownUntil = 0
+
   const consolidateAndAddChipsDeferred = deferred(props.animationTimeMs, () => {
     consolidateChips(boardChanges.consolidations)
     addChips(newChips)
   })
 
   return function (m) {
+    if (Date.now() < moveCooldownUntil) return
+
     consolidateAndAddChipsDeferred.finish()
 
     const result = game[m]()
@@ -236,6 +242,9 @@ function createGameMove(game) {
     }
 
     moveChips(boardChanges.moves)
+    if (boardChanges.moves.length > 0) {
+      moveCooldownUntil = Date.now() + moveDuration
+    }
     consolidateAndAddChipsDeferred.renew()
     if (!game.canMove()) {
       setTimeout(() => {

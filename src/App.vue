@@ -38,7 +38,7 @@
         :tab-index="1"
         :board-size-px="boardSizePx"
         :started="gameStarted"
-        :animationTimeMs="300"
+        :animationTimeMs="200"
         :move-duration-ms="200"
         @started="onGameStarted"
         @ended="onGameEnded"
