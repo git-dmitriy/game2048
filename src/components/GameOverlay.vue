@@ -1,7 +1,7 @@
 <template>
   <div v-if="visible" class="overlay-wrapper">
     <div class="overlay half-white appearing07"></div>
-    <div class="overlay game-over appearing" :style="gameOverStyle">
+    <div class="overlay game-over appearing">
       <p>Game over!</p>
     </div>
   </div>
@@ -9,8 +9,7 @@
 
 <script setup>
 defineProps({
-  visible: { type: Boolean, default: false },
-  gameOverStyle: { type: Object, default: () => ({}) }
+  visible: {type: Boolean, default: false},
 })
 </script>
 
@@ -35,13 +34,14 @@ defineProps({
 }
 
 .half-white {
-  background-color: white;
+  background-color: var(--color-overlay);
   opacity: 0.7;
 }
 
 .game-over {
   font-weight: bold;
   text-align: center;
+  font-size: var(--game-over-font-size);
 }
 
 .appearing {
@@ -53,12 +53,20 @@ defineProps({
 }
 
 @keyframes appearing {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes appearing07 {
-  0% { opacity: 0; }
-  100% { opacity: 0.7; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.7;
+  }
 }
 </style>

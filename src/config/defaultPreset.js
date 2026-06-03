@@ -1,11 +1,19 @@
-import { createGame2048 } from '../lib/game2048.js'
+import {createGame2048} from '../lib/game2048.js'
+import {defaultTileTheme} from './tileThemes/default.js'
+import {defaultLayoutRatios} from '../composables/useBoardLayout.js'
 
 export const defaultPreset = {
     id: 'default',
+    theme: 'default',
+    tileTheme: defaultTileTheme,
 
     board: {
         defaultSize: 4, defaultWidthPx: 420, /** innerWidth < defaultWidthPx * ratio → уменьшаем доску */
         mobileBreakpointRatio: 1.04, mobileWidthRatio: 0.96,
+    },
+
+    layout: {
+        ratios: {...defaultLayoutRatios},
     },
 
     rules: {
@@ -67,7 +75,7 @@ export function getInitialSpawns(preset, size) {
 }
 
 export function getGame2048Options(preset) {
-    const { rules } = preset
+    const {rules} = preset
     const options = {
         spawnFourProbability: rules.spawnFourProbability ?? 0.2,
     }
@@ -84,7 +92,16 @@ export function createGame2048FromPreset(preset, size) {
 export function createPreset(overrides = {}) {
     return {
         ...defaultPreset, ...overrides,
+        tileTheme: overrides.tileTheme ?? defaultPreset.tileTheme,
         board: {...defaultPreset.board, ...overrides.board},
+        layout: {
+            ...defaultPreset.layout,
+            ...overrides.layout,
+            ratios: {
+                ...defaultPreset.layout.ratios,
+                ...overrides.layout?.ratios,
+            },
+        },
         rules: {...defaultPreset.rules, ...overrides.rules},
         timing: {...defaultPreset.timing, ...overrides.timing},
         features: {...defaultPreset.features, ...overrides.features},

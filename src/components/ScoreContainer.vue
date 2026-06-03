@@ -1,14 +1,13 @@
 <template>
-  <div class="score-container" :style="containerStyle">
+  <div class="score-container">
     <div
-      ref="gameAimEl"
-      class="game-aim"
-      :class="{ 'game-aim-reached': gameAimReached }"
-      :style="gameAimStyle"
+        ref="gameAimEl"
+        class="game-aim"
+        :class="{ 'game-aim-reached': gameAimReached }"
     >
       {{ gameAim }}
     </div>
-    <div class="scores" :style="scoreStyle">
+    <div class="scores">
       <div class="score">
         <div class="label">Score</div>
         <div>
@@ -28,21 +27,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 defineProps({
-  score: { type: Number, required: true },
-  scoreInc: { type: String, default: '' },
-  bestScore: { type: Number, required: true },
-  gameAim: { type: Number, required: true },
-  gameAimReached: { type: Boolean, default: false },
-  containerStyle: { type: Object, default: () => ({}) },
-  gameAimStyle: { type: Object, default: () => ({}) },
-  scoreStyle: { type: Object, default: () => ({}) }
+  score: {type: Number, required: true},
+  scoreInc: {type: String, default: ''},
+  bestScore: {type: Number, required: true},
+  gameAim: {type: Number, required: true},
+  gameAimReached: {type: Boolean, default: false},
 })
 
 const gameAimEl = ref(null)
-defineExpose({ gameAimEl })
+defineExpose({gameAimEl})
 </script>
 
 <style scoped>
@@ -50,29 +46,36 @@ defineExpose({ gameAimEl })
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: var(--score-panel-height);
 }
 
 .game-aim {
   font-weight: bold;
-  font-size: 4em;
+  font-size: var(--game-aim-font-size);
   text-align: center;
-  color: white;
-  background-color: #35495e;
+  color: var(--color-on-dark);
+  background-color: var(--color-board);
   border-radius: 5% / 9%;
   width: 38%;
+  box-shadow: var(--game-aim-shadow);
 }
 
 .game-aim-reached {
   text-shadow: 0 0 20px;
   animation: pulse 1s 3;
-  -webkit-animation: pulse 1s 3;
   transition: text-shadow 3s;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .scores {
@@ -80,13 +83,14 @@ defineExpose({ gameAimEl })
   display: flex;
   justify-content: space-between;
   width: 50%;
+  font-size: var(--score-font-size);
 }
 
 .score {
   position: relative;
   text-align: center;
-  color: white;
-  background-color: #9aa4af;
+  color: var(--color-on-dark);
+  background-color: var(--color-panel);
   border-radius: 5% / 8%;
   width: 50%;
   padding-top: 2%;
@@ -95,18 +99,23 @@ defineExpose({ gameAimEl })
 .score-inc {
   position: absolute;
   left: 0;
-  color: #2c3e50;
+  color: var(--color-score-inc);
   width: 100%;
   animation: up-disappear 1.5s;
 }
 
 .score .label {
-  color: white;
+  color: var(--color-on-dark);
   font-size: 1rem;
 }
 
 @keyframes up-disappear {
-  0% { opacity: 0.7; }
-  100% { opacity: 0; transform: translateY(-40px); }
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
 }
 </style>

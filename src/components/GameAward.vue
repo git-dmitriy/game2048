@@ -1,10 +1,9 @@
 <template>
   <div
-    class="award"
-    :class="{ 'award-obtained': award.obtained, 'award-not-obtained': !award.obtained }"
-    :style="customStyle"
+      class="award"
+      :class="{ 'award-obtained': award.obtained, 'award-not-obtained': !award.obtained }"
   >
-    <svg class="like" viewBox="0 0 456.814 456.814" :style="likeStyle">
+    <svg class="like" viewBox="0 0 456.814 456.814">
       <g>
         <path d="M441.11,252.677c10.468-11.99,15.704-26.169,15.704-42.54c0-14.846-5.432-27.692-16.259-38.547
           c-10.849-10.854-23.695-16.278-38.541-16.278h-79.082c0.76-2.664,1.522-4.948,2.282-6.851c0.753-1.903,1.811-3.999,3.138-6.283
@@ -19,13 +18,13 @@
           c3.615,3.525,7.898,5.38,12.847,5.571c6.661,0.191,21.698,4.374,45.111,12.566c14.654,4.941,26.12,8.706,34.4,11.272
           c8.278,2.566,19.849,5.328,34.684,8.282c14.849,2.949,28.551,4.428,41.11,4.428h4.855h21.7h10.276
           c25.321-0.38,44.061-7.806,56.247-22.268c11.036-13.135,15.697-30.361,13.99-51.679c7.422-7.042,12.565-15.984,15.416-26.836
-          c3.231-11.604,3.231-22.74,0-33.397c8.754-11.611,12.847-24.649,12.272-39.115C445.395,268.286,443.971,261.055,441.11,252.677z" />
+          c3.231-11.604,3.231-22.74,0-33.397c8.754-11.611,12.847-24.649,12.272-39.115C445.395,268.286,443.971,261.055,441.11,252.677z"/>
         <path d="M100.5,191.864H18.276c-4.952,0-9.235,1.809-12.851,5.426C1.809,200.905,0,205.188,0,210.137v182.732
           c0,4.942,1.809,9.227,5.426,12.847c3.619,3.611,7.902,5.421,12.851,5.421H100.5c4.948,0,9.229-1.81,12.847-5.421
           c3.616-3.62,5.424-7.904,5.424-12.847V210.137c0-4.949-1.809-9.231-5.424-12.847C109.73,193.672,105.449,191.864,100.5,191.864z
             M67.665,369.308c-3.616,3.521-7.898,5.281-12.847,5.281c-5.14,0-9.471-1.76-12.99-5.281c-3.521-3.521-5.281-7.85-5.281-12.99
           c0-4.948,1.759-9.232,5.281-12.847c3.52-3.617,7.85-5.428,12.99-5.428c4.949,0,9.231,1.811,12.847,5.428
-          c3.617,3.614,5.426,7.898,5.426,12.847C73.091,361.458,71.286,365.786,67.665,369.308z" />
+          c3.617,3.614,5.426,7.898,5.426,12.847C73.091,361.458,71.286,365.786,67.665,369.308z"/>
       </g>
     </svg>
     {{ award.aim }}
@@ -34,9 +33,7 @@
 
 <script setup>
 defineProps({
-  award: { type: Object, required: true },
-  customStyle: { type: Object, default: () => ({}) },
-  likeStyle: { type: Object, default: () => ({}) }
+  award: {type: Object, required: true},
 })
 </script>
 
@@ -44,27 +41,33 @@ defineProps({
 .award {
   border-radius: 15% / 50%;
   text-align: center;
-  font-size: 1.2em;
+  font-size: var(--award-font-size);
+  width: var(--award-width);
 }
 
 .like {
   width: 25%;
+  height: var(--award-like-height);
   top: 2px;
   position: relative;
 }
 
 .award-not-obtained {
-  color: #dee8ff;
-  background-color: #9aa4af;
-  fill: #dee8ff;
+  color: var(--color-award-muted);
+  background-color: var(--color-award-inactive-bg);
+  fill: var(--color-award-muted);
 }
 
 .award-obtained {
-  color: white;
-  text-shadow: 0px 0px 4px orange;
-  background: linear-gradient(to top right, gold, yellow);
-  box-shadow: 0 2px 4px 0 black;
-  fill: white;
-  filter: drop-shadow(-1px -1px 0 orange);
+  color: var(--color-on-dark);
+  text-shadow: 0 0 4px var(--color-award-orange);
+  background: linear-gradient(
+      to top right,
+      var(--color-award-gold),
+      var(--color-award-yellow)
+  );
+  box-shadow: 0 2px 4px 0 var(--color-shadow);
+  fill: var(--color-on-dark);
+  filter: drop-shadow(-1px -1px 0 var(--color-award-orange));
 }
 </style>

@@ -1,0 +1,19 @@
+:root {
+    --color-bg: honeydew;
+    --color-text: #2c3e50;
+    --color-board: #35495e;
+    --color-cell: #41b883;
+    --color-panel: #9aa4af;
+    --color-accent: #41b883;
+    --color-on-dark: white;
+    --color-shadow: black;
+    --color-chip-fallback: honeydew;
+    --color-overlay: white;
+    --color-score-inc: #2c3e50;
+    --color-award-muted: #dee8ff;
+    --color-award-inactive-bg: #9aa4af;
+    --color-award-gold: gold;
+    --color-award-yellow: yellow;
+    --color-award-orange: orange;
+    --font-family: 'Source Sans Pro', Arial, sans-serif;
+}

@@ -1,8 +1,8 @@
 body,
 html {
-  font-family: 'Source Sans Pro', Arial, sans-serif;
-  color: #2c3e50;
-  font-size: 18px;
-  margin: 0;
-  background-color: honeydew;
+    font-family: var(--font-family);
+    color: var(--color-text);
+    font-size: 18px;
+    margin: 0;
+    background-color: var(--color-bg);
 }

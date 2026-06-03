@@ -1,37 +1,37 @@
 <template>
   <div
-    ref="boardEl"
-    class="board"
-    :tabindex="tabIndex"
-    :style="boardStyle"
+      ref="boardEl"
+      class="board"
+      :tabindex="tabIndex"
+      :style="boardStyle"
   >
     <div
-      v-for="(cl, index) in cells"
-      :ref="(el) => setCellRef(el, index)"
-      :key="index"
-      class="cell"
-      :style="cellStyle"
+        v-for="(cl, index) in cells"
+        :ref="(el) => setCellRef(el, index)"
+        :key="index"
+        class="cell"
+        :style="cellStyle"
     >
       <GameChip
-        v-for="(ch, i) in cl.chips"
-        :key="chipKey(ch)"
-        ref="chips"
-        :animation-time-ms="animationTimeMs"
-        :move-duration-ms="moveDurationMs"
-        :move-easing="moveEasing"
-        :chip="ch"
-        :size-px="cellSizePx"
+          v-for="(ch, i) in cl.chips"
+          :key="chipKey(ch)"
+          ref="chips"
+          :animation-time-ms="animationTimeMs"
+          :move-duration-ms="moveDurationMs"
+          :move-easing="moveEasing"
+          :chip="ch"
+          :size-px="cellSizePx"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import {ref, computed, watch, onMounted} from 'vue'
 import GameChip from './GameChip.vue'
-import { deferred } from '../lib/deferred.js'
-import { createSwipeListener } from '../lib/swipe.js'
-import { useGamePreset } from '../composables/useGamePreset.js'
+import {deferred} from '../lib/deferred.js'
+import {createSwipeListener} from '../lib/swipe.js'
+import {useGamePreset} from '../composables/useGamePreset.js'
 import {
   createGame2048FromPreset,
   getInitialSpawns,
@@ -48,16 +48,16 @@ keyMap[40] = 'down'
 const preset = useGamePreset()
 
 const props = defineProps({
-  size: { type: Number, required: true },
-  listenOwnKeyEventsOnly: { type: Boolean, default: false },
-  tabIndex: { type: Number, default: 1 },
-  boardSizePx: { type: Number, default: 0 },
-  animationTimeMs: { type: Number, default: 150 },
+  size: {type: Number, required: true},
+  listenOwnKeyEventsOnly: {type: Boolean, default: false},
+  tabIndex: {type: Number, default: 1},
+  boardSizePx: {type: Number, default: 0},
+  animationTimeMs: {type: Number, default: 150},
   /** Длительность анимации движения плиток (мс). По умолчанию = animationTimeMs */
-  moveDurationMs: { type: Number, default: undefined },
+  moveDurationMs: {type: Number, default: undefined},
   /** Easing анимации движения (CSS: ease-out, linear, cubic-bezier(...) и т.д.) */
-  moveEasing: { type: String, default: 'ease-out' },
-  started: { type: Boolean, default: false }
+  moveEasing: {type: String, default: 'ease-out'},
+  started: {type: Boolean, default: false}
 })
 
 const emit = defineEmits(['started', 'ended', 'score', 'aim-changed', 'aim-reached'])
@@ -75,7 +75,7 @@ let chipIdCounter = 0
 let moveKeyCounter = 0
 
 function createCellsArray() {
-  return Array.from({ length: props.size * props.size }, () => ({ chips: [] }))
+  return Array.from({length: props.size * props.size}, () => ({chips: []}))
 }
 
 function setCellRef(el, index) {
@@ -175,7 +175,7 @@ function emptyCells() {
 }
 
 function addChip(c) {
-  const chip = { value: c.value, _chipId: ++chipIdCounter }
+  const chip = {value: c.value, _chipId: ++chipIdCounter}
   cells.value[getCellIndex(c)].chips.push(chip)
 }
 
@@ -214,7 +214,7 @@ function consolidateChips(consolidations) {
 }
 
 function createGameMove(game) {
-  const boardChanges = { moves: [], consolidations: [] }
+  const boardChanges = {moves: [], consolidations: []}
   const newChips = []
   const moveDuration = props.moveDurationMs ?? props.animationTimeMs
   /** Не принимаем новый ход, пока не закончится анимация движения текущего хода */
@@ -237,7 +237,7 @@ function createGameMove(game) {
     if (result.moves && result.moves.length > 0) {
       newChips.push(...game.spawnTiles(getSpawnsPerMove(preset, props.size)))
       if (result.scoreInc > 0) {
-        emit('score', { score: game.score(), scoreInc: result.scoreInc })
+        emit('score', {score: game.score(), scoreInc: result.scoreInc})
         for (let i = 0; i < boardChanges.consolidations.length; i++) {
           if (boardChanges.consolidations[i].value === aim.value) {
             emit('aim-reached')
@@ -284,7 +284,7 @@ function endGame() {
 
 onMounted(() => {
   boardSizeAutoPx.value =
-    props.boardSizePx > 0 ? props.boardSizePx : boardEl.value?.getBoundingClientRect().width || 0
+      props.boardSizePx > 0 ? props.boardSizePx : boardEl.value?.getBoundingClientRect().width || 0
 })
 </script>
 
@@ -294,12 +294,12 @@ onMounted(() => {
   flex-wrap: wrap;
   align-content: flex-start;
   align-items: space-around;
-  background-color: #35495e;
+  background-color: var(--color-board);
   outline: none;
 }
 
 .cell {
-  background-color: #41b883;
+  background-color: var(--color-cell);
   position: relative;
   border-radius: 7%;
 }

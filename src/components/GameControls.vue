@@ -1,32 +1,30 @@
 <template>
-  <div class="game-controls" :style="controlsStyle">
+  <div class="game-controls">
     <div v-if="!gameStarted" class="size-control">
       Size:
       <template v-for="s in sizes" :key="'size-' + s">
         <input
-          :id="'size-radio' + s"
-          type="radio"
-          :value="s"
-          :checked="modelValue === s"
-          @change="$emit('update:modelValue', s)"
+            :id="'size-radio' + s"
+            type="radio"
+            :value="s"
+            :checked="modelValue === s"
+            @change="$emit('update:modelValue', s)"
         />
         <label :for="'size-radio' + s">{{ s }}</label>
       </template>
       &nbsp;
     </div>
     <button
-      v-if="!gameStarted"
-      class="button"
-      :style="buttonStyle"
-      @click="$emit('start')"
+        v-if="!gameStarted"
+        class="button"
+        @click="$emit('start')"
     >
       New Game
     </button>
     <button
-      v-else
-      class="button"
-      :style="buttonStyle"
-      @click="$emit('end')"
+        v-else
+        class="button"
+        @click="$emit('end')"
     >
       End
     </button>
@@ -35,11 +33,9 @@
 
 <script setup>
 defineProps({
-  gameStarted: { type: Boolean, required: true },
-  sizes: { type: Array, required: true },
-  modelValue: { type: Number, required: true },
-  controlsStyle: { type: Object, default: () => ({}) },
-  buttonStyle: { type: Object, default: () => ({}) }
+  gameStarted: {type: Boolean, required: true},
+  sizes: {type: Array, required: true},
+  modelValue: {type: Number, required: true},
 })
 
 defineEmits(['update:modelValue', 'start', 'end'])
@@ -51,6 +47,7 @@ defineEmits(['update:modelValue', 'start', 'end'])
   justify-content: flex-end;
   align-items: center;
   width: 100%;
+  height: var(--controls-height);
 }
 
 .size-control {
@@ -69,7 +66,7 @@ defineEmits(['update:modelValue', 'start', 'end'])
 
 .size-control input[type='radio'] + label {
   cursor: pointer;
-  border: 5px solid #35495e;
+  border: 5px solid var(--color-board);
   height: 30px;
   width: 30px;
   display: inline-flex;
@@ -83,26 +80,31 @@ defineEmits(['update:modelValue', 'start', 'end'])
 }
 
 .size-control input[type='radio']:checked + label {
-  background: #41b883;
-  color: white;
+  background: var(--color-accent);
+  color: var(--color-on-dark);
 }
 
 .button {
-  background-color: #35495e;
+  background-color: var(--color-board);
   border: none;
   border-radius: 5% / 9%;
   width: 25%;
   height: 75%;
-  color: white;
+  color: var(--color-on-dark);
   outline: none;
   font-weight: bold;
   overflow: hidden;
   cursor: pointer;
   animation: appearing 0.5s;
+  font-size: var(--button-font-size);
 }
 
 @keyframes appearing {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>

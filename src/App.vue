@@ -2,7 +2,7 @@
   <div
       ref="appEl"
       class="main-container appearing"
-      :style="[mainContainerStyle, { visibility: isVisible ? 'visible' : 'hidden' }]"
+      :style="[layoutVars, { visibility: isVisible ? 'visible' : 'hidden' }]"
   >
     <ScoreContainer
         ref="scoreContainerRef"
@@ -11,9 +11,6 @@
         :best-score="bestScore[size]"
         :game-aim="gameAim"
         :game-aim-reached="gameAimReached"
-        :container-style="scoreContainerStyle"
-        :game-aim-style="gameAimStyle"
-        :score-style="scoreStyle"
     />
     <GameControls
         :game-started="gameStarted"
@@ -22,14 +19,9 @@
         @update:model-value="onSizeChange"
         @start="startGame"
         @end="gameStarted = false"
-        :controls-style="gameControlsStyle"
-        :button-style="buttonStyle"
     />
-    <div class="game-container" :style="gameContainerStyle">
-      <GameOverlay
-          :visible="gameEnded"
-          :game-over-style="gameOverStyle"
-      />
+    <div class="game-container">
+      <GameOverlay :visible="gameEnded"/>
       <GameBoard
           ref="gameRef"
           :size="size"
@@ -47,18 +39,12 @@
           @aim-reached="onGameAimReached"
       />
     </div>
-    <div
-        v-if="features.awards"
-        class="game-awards-container"
-        :style="gameAwardsContainerStyle"
-    >
+    <div v-if="features.awards" class="game-awards-container">
       <GameAward
           v-for="a in awardsList"
           :ref="(el) => setAwardRef(el, a.aim)"
           :key="a.aim"
           :award="a"
-          :custom-style="gameAwardStyle"
-          :like-style="gameAwardLikeStyle"
       />
     </div>
     <div
@@ -81,12 +67,13 @@ import GameOverlay from './components/GameOverlay.vue'
 import GameBoard from './components/GameBoard.vue'
 import GameAward from './components/GameAward.vue'
 import {useGamePreset} from './composables/useGamePreset.js'
-import { getBoardSizes, getWinTile } from './config/defaultPreset.js'
+import {useBoardLayout} from './composables/useBoardLayout.js'
+import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 
 const preset = useGamePreset()
 const {board, timing, features, input} = preset
+const {boardSizePx, layoutVars, fitBoardSizePx} = useBoardLayout(preset)
 
-const defBoardSizePx = board.defaultWidthPx
 const defSize = board.defaultSize
 const listenOwnKeyEventsOnly = input.listenKeysOn === 'board'
 
@@ -105,7 +92,6 @@ const gameRef = ref(null)
 const collectAllAwardsRef = ref(null)
 const awardRefs = ref({})
 
-const boardSizePx = ref(defBoardSizePx)
 const size = ref(defSize)
 const gameStarted = ref(false)
 const gameEnded = ref(false)
@@ -123,56 +109,6 @@ const allAwardsObtained = computed(() => {
   }
   return true
 })
-
-const gameOverStyle = computed(() => ({
-  fontSize: boardSizePx.value / 6 + 'px'
-}))
-
-const gameContainerStyle = computed(() => ({
-  width: boardSizePx.value + 'px',
-  height: boardSizePx.value + 'px'
-}))
-
-const mainContainerStyle = computed(() => ({
-  width: boardSizePx.value + 'px'
-}))
-
-const gameControlsStyle = computed(() => ({
-  height: boardSizePx.value * 0.2 + 'px'
-}))
-
-const scoreContainerStyle = computed(() => ({
-  height: boardSizePx.value * 0.2 + 'px'
-}))
-
-const gameAimStyle = computed(() => {
-  const bsh = boardSizePx.value / 50 + 'px '
-  return {
-    boxShadow: '0 ' + bsh + bsh + 'black',
-    fontSize: boardSizePx.value / 110 + 'em'
-  }
-})
-
-const buttonStyle = computed(() => ({
-  fontSize: boardSizePx.value / 450 + 'em'
-}))
-
-const scoreStyle = computed(() => ({
-  fontSize: boardSizePx.value / 280 + 'em'
-}))
-
-const gameAwardsContainerStyle = computed(() => ({
-  height: boardSizePx.value * 0.08 + 'px'
-}))
-
-const gameAwardStyle = computed(() => ({
-  width: boardSizePx.value / 5 + 'px',
-  fontSize: boardSizePx.value / 350 + 'em'
-}))
-
-const gameAwardLikeStyle = computed(() => ({
-  height: boardSizePx.value / 21 + 'px'
-}))
 
 function setAwardRef(el, aim) {
   if (el) {
@@ -202,18 +138,10 @@ function persistState() {
   try {
     const state = {
       bestScore: {...bestScore},
-      awards: {...awards}
+      awards: {...awards},
     }
     document.cookie = JSON.stringify(state)
   } catch (e) {
-  }
-}
-
-function fitBoardSizePx() {
-  if (window.innerWidth < defBoardSizePx * board.mobileBreakpointRatio) {
-    boardSizePx.value = window.innerWidth * board.mobileWidthRatio
-  } else {
-    boardSizePx.value = defBoardSizePx
   }
 }
 
@@ -257,7 +185,7 @@ function onGameScore(args) {
     ease: 'none',
     onUpdate: () => {
       score.value = Math.floor(s.score)
-    }
+    },
   })
 
   if (features.bestScorePerSize && args.score > bestScore[size.value]) {
@@ -268,7 +196,7 @@ function onGameScore(args) {
       ease: 'none',
       onUpdate: () => {
         bestScore[size.value] = Math.floor(bs.score)
-      }
+      },
     })
   }
 
@@ -292,7 +220,8 @@ function onGameAimReached() {
   if (!features.awards) return
 
   const awardEl = awardRefs.value[gameAim.value]?.$el
-  const gameAimEl = scoreContainerRef.value?.gameAimEl?.value ?? scoreContainerRef.value?.gameAimEl
+  const gameAimEl =
+      scoreContainerRef.value?.gameAimEl?.value ?? scoreContainerRef.value?.gameAimEl
   if (awardEl && gameAimEl) {
     const p1 = gameAimEl.getBoundingClientRect()
     const p2 = awardEl.getBoundingClientRect()
@@ -302,12 +231,12 @@ function onGameAimReached() {
     const y = p1.top - p2.top + p1.height / 2
 
     const s = awardEl.style
-    s['-webkit-transform'] = s.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + ws + ',' + hs + ')'
-    s['-webkit-transition'] = s.transition = ''
+    s.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + ws + ',' + hs + ')'
+    s.transition = ''
     s.zIndex = 100
     requestAnimationFrame(() => {
-      s['-webkit-transition'] = s.transition = 'all 2s'
-      s['-webkit-transform'] = s.transform = ''
+      s.transition = 'all 2s'
+      s.transform = ''
     })
   }
 }
@@ -316,9 +245,9 @@ function showCollectAllAwards() {
   const el = collectAllAwardsRef.value
   if (el) {
     const s = el.style
-    s['-webkit-animation'] = s.animation = ''
+    s.animation = ''
     requestAnimationFrame(() => {
-      s['-webkit-animation'] = s.animation = 'collect-all-awards 10s'
+      s.animation = 'collect-all-awards 10s'
     })
   }
 }
@@ -347,12 +276,14 @@ onMounted(() => {
   flex-direction: column;
   margin: 0 auto;
   padding: 2%;
+  width: var(--board-size);
   transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
 
 .game-container {
   position: relative;
+  width: var(--board-size);
+  height: var(--board-size);
 }
 
 .game-awards-container {
@@ -360,6 +291,7 @@ onMounted(() => {
   justify-content: space-around;
   align-items: center;
   margin-top: 2%;
+  height: var(--awards-height);
 }
 
 .collect-all-awards {
@@ -370,7 +302,7 @@ onMounted(() => {
 }
 
 .collect-all-awards span {
-  border: 1px solid #2c3e50;
+  border: 1px solid var(--color-text);
   border-radius: 7% / 50%;
   padding: 0 3px;
 }
