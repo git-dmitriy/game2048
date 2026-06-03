@@ -1,5 +1,9 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import './index.css'
+import {defaultPreset} from './config/defaultPreset.js'
+import {gamePresetKey} from './config/injectionKeys.js'
 
-createApp(App).mount('#app')
+createApp(App)
+    .provide(gamePresetKey, defaultPreset)
+    .mount('#app')

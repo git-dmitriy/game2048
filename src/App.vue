@@ -1,66 +1,72 @@
 <template>
   <div
-    ref="appEl"
-    class="main-container appearing"
-    :style="[mainContainerStyle, { visibility: isVisible ? 'visible' : 'hidden' }]"
+      ref="appEl"
+      class="main-container appearing"
+      :style="[mainContainerStyle, { visibility: isVisible ? 'visible' : 'hidden' }]"
   >
     <ScoreContainer
-      ref="scoreContainerRef"
-      :score="score"
-      :score-inc="scoreInc"
-      :best-score="bestScore[size]"
-      :game-aim="gameAim"
-      :game-aim-reached="gameAimReached"
-      :container-style="scoreContainerStyle"
-      :game-aim-style="gameAimStyle"
-      :score-style="scoreStyle"
+        ref="scoreContainerRef"
+        :score="score"
+        :score-inc="scoreInc"
+        :best-score="bestScore[size]"
+        :game-aim="gameAim"
+        :game-aim-reached="gameAimReached"
+        :container-style="scoreContainerStyle"
+        :game-aim-style="gameAimStyle"
+        :score-style="scoreStyle"
     />
     <GameControls
-      :game-started="gameStarted"
-      :sizes="sizes"
-      :model-value="size"
-      @update:model-value="onSizeChange"
-      @start="startGame"
-      @end="gameStarted = false"
-      :controls-style="gameControlsStyle"
-      :button-style="buttonStyle"
+        :game-started="gameStarted"
+        :sizes="sizes"
+        :model-value="size"
+        @update:model-value="onSizeChange"
+        @start="startGame"
+        @end="gameStarted = false"
+        :controls-style="gameControlsStyle"
+        :button-style="buttonStyle"
     />
     <div class="game-container" :style="gameContainerStyle">
       <GameOverlay
-        :visible="gameEnded"
-        :game-over-style="gameOverStyle"
+          :visible="gameEnded"
+          :game-over-style="gameOverStyle"
       />
       <GameBoard
-        ref="gameRef"
-        :size="size"
-        :size-aim-map="sizeAimMap"
-        :listen-own-key-events-only="false"
-        :tab-index="1"
-        :board-size-px="boardSizePx"
-        :started="gameStarted"
-        :animationTimeMs="200"
-        :move-duration-ms="200"
-        @started="onGameStarted"
-        @ended="onGameEnded"
-        @score="onGameScore"
-        @aim-changed="onGameAimChanged"
-        @aim-reached="onGameAimReached"
-      />
-    </div>
-    <div class="game-awards-container" :style="gameAwardsContainerStyle">
-      <GameAward
-        v-for="a in awardsList"
-        :ref="(el) => setAwardRef(el, a.aim)"
-        :key="a.aim"
-        :award="a"
-        :custom-style="gameAwardStyle"
-        :like-style="gameAwardLikeStyle"
+          ref="gameRef"
+          :size="size"
+          :size-aim-map="sizeAimMap"
+          :listen-own-key-events-only="listenOwnKeyEventsOnly"
+          :tab-index="1"
+          :board-size-px="boardSizePx"
+          :started="gameStarted"
+          :animation-time-ms="timing.animationMs"
+          :move-duration-ms="timing.moveMs"
+          :move-easing="timing.moveEasing"
+          @started="onGameStarted"
+          @ended="onGameEnded"
+          @score="onGameScore"
+          @aim-changed="onGameAimChanged"
+          @aim-reached="onGameAimReached"
       />
     </div>
     <div
-      v-show="!allAwardsObtained"
-      ref="collectAllAwardsRef"
-      class="collect-all-awards"
+        v-if="features.awards"
+        class="game-awards-container"
+        :style="gameAwardsContainerStyle"
+    >
+      <GameAward
+          v-for="a in awardsList"
+          :ref="(el) => setAwardRef(el, a.aim)"
+          :key="a.aim"
+          :award="a"
+          :custom-style="gameAwardStyle"
+          :like-style="gameAwardLikeStyle"
+      />
+    </div>
+    <div
+        v-if="features.collectAllBanner"
+        v-show="!allAwardsObtained"
+        ref="collectAllAwardsRef"
+        class="collect-all-awards"
     >
       <span>Collect all awards!</span>
     </div>
@@ -68,31 +74,31 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import {ref, reactive, computed, watch, onMounted, nextTick} from 'vue'
+import {gsap} from 'gsap'
 import ScoreContainer from './components/ScoreContainer.vue'
 import GameControls from './components/GameControls.vue'
 import GameOverlay from './components/GameOverlay.vue'
 import GameBoard from './components/GameBoard.vue'
 import GameAward from './components/GameAward.vue'
+import {useGamePreset} from './composables/useGamePreset.js'
+import {buildSizeAimMap, getBoardSizes, getWinTile} from './config/defaultPreset.js'
 
-const defBoardSizePx = 420
-const defSize = 4
+const preset = useGamePreset()
+const {board, timing, features, input} = preset
 
-const sizeAimMap = []
-sizeAimMap[3] = 256
-sizeAimMap[4] = 2048
-sizeAimMap[5] = 4096
-sizeAimMap[6] = 8192
+const defBoardSizePx = board.defaultWidthPx
+const defSize = board.defaultSize
+const sizeAimMap = buildSizeAimMap(preset)
+const listenOwnKeyEventsOnly = input.listenKeysOn === 'board'
 
 const awards = reactive({})
 const bestScore = reactive({})
-const sizes = []
-for (const s in sizeAimMap) {
-  const a = sizeAimMap[s]
+const sizes = getBoardSizes(preset)
+for (const s of sizes) {
+  const a = getWinTile(preset, s)
   bestScore[s] = 0
-  awards[a] = { aim: a, obtained: false }
-  sizes.push(Number(s))
+  awards[a] = {aim: a, obtained: false}
 }
 
 const appEl = ref(null)
@@ -105,7 +111,7 @@ const boardSizePx = ref(defBoardSizePx)
 const size = ref(defSize)
 const gameStarted = ref(false)
 const gameEnded = ref(false)
-const gameAim = ref(sizeAimMap[defSize])
+const gameAim = ref(getWinTile(preset, defSize))
 const gameAimReached = ref(false)
 const score = ref(0)
 const scoreInc = ref('')
@@ -190,22 +196,24 @@ function loadState() {
         if (state.bestScore) Object.assign(bestScore, state.bestScore)
       }
     }
-  } catch (e) {}
+  } catch (e) {
+  }
 }
 
 function persistState() {
   try {
     const state = {
-      bestScore: { ...bestScore },
-      awards: { ...awards }
+      bestScore: {...bestScore},
+      awards: {...awards}
     }
     document.cookie = JSON.stringify(state)
-  } catch (e) {}
+  } catch (e) {
+  }
 }
 
 function fitBoardSizePx() {
-  if (window.innerWidth < defBoardSizePx * 1.04) {
-    boardSizePx.value = window.innerWidth * 0.96
+  if (window.innerWidth < defBoardSizePx * board.mobileBreakpointRatio) {
+    boardSizePx.value = window.innerWidth * board.mobileWidthRatio
   } else {
     boardSizePx.value = defBoardSizePx
   }
@@ -214,7 +222,9 @@ function fitBoardSizePx() {
 function startGame() {
   gameStarted.value = true
   score.value = 0
-  showCollectAllAwards()
+  if (features.collectAllBanner) {
+    showCollectAllAwards()
+  }
 }
 
 function onGameStarted() {
@@ -230,7 +240,19 @@ function onGameEnded() {
 }
 
 function onGameScore(args) {
-  const s = { score: score.value }
+  if (features.scoreAnimation !== 'gsap') {
+    score.value = args.score
+    if (features.bestScorePerSize && args.score > bestScore[size.value]) {
+      bestScore[size.value] = args.score
+    }
+    scoreInc.value = args.scoreInc + '+'
+    nextTick(() => {
+      scoreInc.value = ''
+    })
+    return
+  }
+
+  const s = {score: score.value}
   gsap.to(s, {
     duration: 0.3,
     score: args.score,
@@ -240,8 +262,8 @@ function onGameScore(args) {
     }
   })
 
-  if (args.score > bestScore[size.value]) {
-    const bs = { score: bestScore[size.value] }
+  if (features.bestScorePerSize && args.score > bestScore[size.value]) {
+    const bs = {score: bestScore[size.value]}
     gsap.to(bs, {
       duration: 0.3,
       score: args.score,
@@ -264,8 +286,12 @@ function onGameAimChanged(aim) {
 
 function onGameAimReached() {
   gameAimReached.value = true
-  awards[gameAim.value].obtained = true
+  if (features.awards && awards[gameAim.value]) {
+    awards[gameAim.value].obtained = true
+  }
   persistState()
+
+  if (!features.awards) return
 
   const awardEl = awardRefs.value[gameAim.value]?.$el
   const gameAimEl = scoreContainerRef.value?.gameAimEl?.value ?? scoreContainerRef.value?.gameAimEl
@@ -309,7 +335,9 @@ onMounted(() => {
     fitBoardSizePx()
     requestAnimationFrame(() => {
       isVisible.value = true
-      showCollectAllAwards()
+      if (features.collectAllBanner) {
+        showCollectAllAwards()
+      }
     })
   })
 })
@@ -354,27 +382,82 @@ onMounted(() => {
 }
 
 @keyframes appearing {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes collect-all-awards {
-  0% { opacity: 0; transform: translateY(20px); }
-  60% { transform: translateY(20px); opacity: 0; }
-  65% { opacity: 1; transform: translateY(0); }
-  78% { transform: translateX(0); opacity: 1; }
-  79% { transform: translateX(5px); opacity: 1; }
-  80% { transform: translateX(-5px); opacity: 1; }
-  81% { transform: translateX(5px); opacity: 1; }
-  82% { transform: translateX(-5px); opacity: 1; }
-  83% { transform: translateX(5px); opacity: 1; }
-  84% { transform: translateX(-5px); opacity: 1; }
-  85% { transform: translateX(5px); opacity: 1; }
-  86% { transform: translateX(-5px); opacity: 1; }
-  87% { transform: translateX(5px); opacity: 1; }
-  88% { transform: translateX(-5px); opacity: 1; }
-  89% { transform: translateX(0); opacity: 1; }
-  99% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateY(20px); opacity: 0; }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  60% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  78% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  79% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(-5px);
+    opacity: 1;
+  }
+  81% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+  82% {
+    transform: translateX(-5px);
+    opacity: 1;
+  }
+  83% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+  84% {
+    transform: translateX(-5px);
+    opacity: 1;
+  }
+  85% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+  86% {
+    transform: translateX(-5px);
+    opacity: 1;
+  }
+  87% {
+    transform: translateX(5px);
+    opacity: 1;
+  }
+  88% {
+    transform: translateX(-5px);
+    opacity: 1;
+  }
+  89% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  99% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
 }
 </style>
