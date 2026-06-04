@@ -44,7 +44,9 @@ export const defaultPreset = {
     },
 
     persistence: {
+        /** 'cookie' | 'localStorage' | 'none' */
         storage: 'cookie',
+        key: 'game2048-state',
     },
 
     input: {
@@ -114,7 +116,10 @@ export function createPreset(overrides = {}) {
         rules: {...defaultPreset.rules, ...overrides.rules},
         timing: {...defaultPreset.timing, ...overrides.timing},
         features: {...defaultPreset.features, ...overrides.features},
-        persistence: {...defaultPreset.persistence, ...overrides.persistence},
+        persistence: {
+            ...defaultPreset.persistence,
+            ...overrides.persistence,
+        },
         input: {...defaultPreset.input, ...overrides.input},
     }
 }

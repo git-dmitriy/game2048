@@ -124,6 +124,7 @@ import {useGamePreset} from './composables/useGamePreset.js'
 import {useBoardLayout} from './composables/useBoardLayout.js'
 import {useAppComponents} from './composables/useAppComponents.js'
 import {useAwardAnimation} from './composables/useAwardAnimation.js'
+import {useGamePersistence} from './composables/useGamePersistence.js'
 import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 
 const preset = useGamePreset()
@@ -143,6 +144,8 @@ for (const s of sizes) {
   bestScore[s] = 0
   awards[a] = {aim: a, obtained: false}
 }
+
+const {loadState, persistState} = useGamePersistence(preset, {awards, bestScore})
 
 const scoreContainerRef = ref(null)
 const gameRef = ref(null)
@@ -184,31 +187,6 @@ function replayCollectAllBanner() {
 
 function onSizeChange(v) {
   size.value = v
-}
-
-function loadState() {
-  try {
-    const s = document.cookie
-    if (s) {
-      const state = JSON.parse(s)
-      if (state) {
-        if (state.awards) Object.assign(awards, state.awards)
-        if (state.bestScore) Object.assign(bestScore, state.bestScore)
-      }
-    }
-  } catch (e) {
-  }
-}
-
-function persistState() {
-  try {
-    const state = {
-      bestScore: {...bestScore},
-      awards: {...awards},
-    }
-    document.cookie = JSON.stringify(state)
-  } catch (e) {
-  }
 }
 
 function startGame() {
