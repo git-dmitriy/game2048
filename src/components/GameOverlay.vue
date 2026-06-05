@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { useStrings } from '../composables/useStrings.js'
+import {useStrings} from '../composables/useStrings.js'
 
 const strings = useStrings()
 
@@ -39,13 +39,13 @@ defineProps({
 
 .half-white {
   background-color: var(--color-overlay);
-  opacity: 0.7;
 }
 
 .game-over {
   font-weight: bold;
   text-align: center;
   font-size: var(--game-over-font-size);
+  color: var(--color-text);
 }
 
 .appearing {
@@ -70,7 +70,7 @@ defineProps({
     opacity: 0;
   }
   100% {
-    opacity: 0.7;
+    opacity: 1;
   }
 }
 </style>

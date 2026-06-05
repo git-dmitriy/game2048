@@ -64,7 +64,7 @@ defineExpose({gameAimEl})
 }
 
 .game-aim-reached {
-  text-shadow: 0 0 20px;
+  text-shadow: 0 0 20px var(--color-aim-reached-glow);
   animation: pulse 1s 3;
   transition: text-shadow 3s;
 }
@@ -108,7 +108,7 @@ defineExpose({gameAimEl})
 }
 
 .score .label {
-  color: var(--color-on-dark);
+  color: var(--color-score-label);
   font-size: 1rem;
 }
 

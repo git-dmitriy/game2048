@@ -1,5 +1,11 @@
 <template>
-  <div ref="chipEl" class="chip" :style="style">{{ chip.value }}</div>
+  <div
+      ref="chipEl"
+      class="chip"
+      :data-value="chip.value"
+      :style="fontSizeStyle"
+  >{{ chip.value }}
+  </div>
 </template>
 
 <script setup>
@@ -16,9 +22,10 @@ const props = defineProps({
   moveEasing: {type: String, default: 'ease-out'},
 })
 
-const style = computed(() =>
-    tileTheme.getChipStyle(props.chip.value, props.sizePx)
-)
+const fontSizeStyle = computed(() => {
+  const {fontSize} = tileTheme.getChipStyle(props.chip.value, props.sizePx)
+  return {fontSize}
+})
 
 const chipEl = ref(null)
 
@@ -76,7 +83,6 @@ onMounted(() => {
   overflow: hidden;
   text-align: justify;
   font-weight: bold;
-  background-color: var(--color-chip-fallback);
   z-index: 1;
   border-radius: 7%;
   transform: translateZ(0);

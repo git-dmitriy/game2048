@@ -53,7 +53,7 @@ defineProps({
 }
 
 .award-not-obtained {
-  color: var(--color-award-muted);
+  color: var(--color-on-dark);
   background-color: var(--color-award-inactive-bg);
   fill: var(--color-award-muted);
 }

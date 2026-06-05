@@ -1,19 +1,61 @@
 :root {
-    --color-bg: honeydew;
-    --color-text: #2c3e50;
+    /* Поверхности */
+    --color-bg: #f0fff0;
     --color-board: #35495e;
     --color-cell: #41b883;
     --color-panel: #9aa4af;
-    --color-accent: #41b883;
-    --color-on-dark: white;
-    --color-shadow: black;
-    --color-chip-fallback: honeydew;
-    --color-overlay: white;
+    --color-overlay: rgba(255, 255, 255, 0.7);
+
+    /* Текст */
+    --color-text: #2c3e50;
+    --color-on-dark: #ffffff;
     --color-score-inc: #2c3e50;
+    --color-score-label: #ffffff;
+
+    /* Интерактив */
+    --color-accent: #41b883;
+    --color-control-border: #35495e;
+
+    /* Эффекты */
+    --color-shadow: #000000;
+    --color-aim-reached-glow: #ffffff;
+
+    /* Плитки — общее */
+    --color-chip-fallback: #f0fff0;
+    --color-tile-shadow: 0 2px 4px 0 #000000;
+    --color-tile-shadow-glow: 0 0 20px 4px #ffffff;
+
+    --color-tile-2: #87e293;
+    --color-tile-2-text: #ffffff;
+    --color-tile-4: #87e273;
+    --color-tile-4-text: #ffffff;
+    --color-tile-8: #eecf40;
+    --color-tile-8-text: #ffffff;
+    --color-tile-16: #ffaa4f;
+    --color-tile-16-text: #ffffff;
+    --color-tile-32: #6bcae2;
+    --color-tile-32-text: #ffffff;
+    --color-tile-64: #9ebbee;
+    --color-tile-64-text: #ffffff;
+    --color-tile-128: #ffffff;
+    --color-tile-128-text: #2c3e50;
+    --color-tile-256: #ffffff;
+    --color-tile-256-text: #2c3e50;
+    --color-tile-512: #ffffff;
+    --color-tile-512-text: #2c3e50;
+    --color-tile-1024: #ffffff;
+    --color-tile-1024-text: #2c3e50;
+    --color-tile-2048: #ffffff;
+    --color-tile-2048-text: #2c3e50;
+    --color-tile-default: #ffffff;
+    --color-tile-default-text: #2c3e50;
+
+    /* Награды */
     --color-award-muted: #dee8ff;
     --color-award-inactive-bg: #9aa4af;
-    --color-award-gold: gold;
-    --color-award-yellow: yellow;
-    --color-award-orange: orange;
+    --color-award-gold: #ffd700;
+    --color-award-yellow: #ffff00;
+    --color-award-orange: #ffa500;
+
     --font-family: 'Source Sans Pro', Arial, sans-serif;
 }

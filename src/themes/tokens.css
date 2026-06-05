@@ -1,0 +1,15 @@
+/**
+ * Контракт CSS-переменных темы.
+ * Каждый файл темы (default, classic, classic-dark) задаёт все переменные из этого списка.
+ *
+ * Поверхности:  --color-bg, --color-board, --color-cell, --color-panel, --color-overlay
+ * Текст:        --color-text, --color-on-dark, --color-score-inc, --color-score-label
+ * Интерактив:   --color-accent, --color-control-border
+ * Эффекты:      --color-shadow, --color-aim-reached-glow
+ * Плитки:       --color-chip-fallback, --color-tile-shadow, --color-tile-shadow-glow
+ *               --color-tile-{2,4,8,16,32,64,128,256,512,1024,2048}
+ *               --color-tile-{value}-text, --color-tile-default, --color-tile-default-text
+ * Награды:      --color-award-muted, --color-award-inactive-bg,
+ *               --color-award-gold, --color-award-yellow, --color-award-orange
+ * Типографика:  --font-family
+ */

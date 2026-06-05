@@ -1,0 +1,64 @@
+/**
+ * Классическая палитра 2048 в тёмном режиме.
+ */
+:root {
+    /* Поверхности */
+    --color-bg: #1a1a1a;
+    --color-board: #3c3a32;
+    --color-cell: #4d4c48;
+    --color-panel: #3c3a32;
+    --color-overlay: rgba(60, 58, 50, 0.88);
+
+    /* Текст */
+    --color-text: #f9f6f2;
+    --color-on-dark: #f9f6f2;
+    --color-score-inc: #f9f6f2;
+    --color-score-label: #eee4da;
+
+    /* Интерактив */
+    --color-accent: #8f7a66;
+    --color-control-border: #3c3a32;
+
+    /* Эффекты */
+    --color-shadow: rgba(0, 0, 0, 0.45);
+    --color-aim-reached-glow: #edc22e;
+
+    /* Плитки — общее */
+    --color-chip-fallback: #4a463f;
+    --color-tile-shadow: none;
+    --color-tile-shadow-glow: none;
+
+    --color-tile-2: #4a463f;
+    --color-tile-2-text: #eee4da;
+    --color-tile-4: #5a554c;
+    --color-tile-4-text: #eee4da;
+    --color-tile-8: #9c6c4a;
+    --color-tile-8-text: #f9f6f2;
+    --color-tile-16: #b85c42;
+    --color-tile-16-text: #f9f6f2;
+    --color-tile-32: #c4513d;
+    --color-tile-32-text: #f9f6f2;
+    --color-tile-64: #d94e2b;
+    --color-tile-64-text: #f9f6f2;
+    --color-tile-128: #c9a84a;
+    --color-tile-128-text: #f9f6f2;
+    --color-tile-256: #c4a53f;
+    --color-tile-256-text: #f9f6f2;
+    --color-tile-512: #bf9f35;
+    --color-tile-512-text: #f9f6f2;
+    --color-tile-1024: #b8992e;
+    --color-tile-1024-text: #f9f6f2;
+    --color-tile-2048: #edc22e;
+    --color-tile-2048-text: #f9f6f2;
+    --color-tile-default: #2a2824;
+    --color-tile-default-text: #f9f6f2;
+
+    /* Награды */
+    --color-award-muted: var(--color-on-dark);
+    --color-award-inactive-bg: #4d4c48;
+    --color-award-gold: #edc22e;
+    --color-award-yellow: #edc850;
+    --color-award-orange: #f59563;
+
+    --font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+}

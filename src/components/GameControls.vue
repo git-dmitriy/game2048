@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { useStrings } from '../composables/useStrings.js'
+import {useStrings} from '../composables/useStrings.js'
 
 const strings = useStrings()
 
@@ -56,6 +56,7 @@ defineEmits(['update:modelValue', 'start', 'end'])
 
 .size-control {
   width: 75%;
+  color: var(--color-text);
   font-weight: bold;
   display: flex;
   justify-content: space-between;
@@ -70,7 +71,7 @@ defineEmits(['update:modelValue', 'start', 'end'])
 
 .size-control input[type='radio'] + label {
   cursor: pointer;
-  border: 5px solid var(--color-board);
+  border: 5px solid var(--color-control-border);
   height: 30px;
   width: 30px;
   display: inline-flex;

@@ -1,0 +1,73 @@
+.chip {
+    background-color: var(--color-chip-fallback);
+    color: var(--color-tile-default-text);
+    box-shadow: var(--color-tile-shadow);
+}
+
+.chip[data-value='2'] {
+    background-color: var(--color-tile-2);
+    color: var(--color-tile-2-text);
+}
+
+.chip[data-value='4'] {
+    background-color: var(--color-tile-4);
+    color: var(--color-tile-4-text);
+}
+
+.chip[data-value='8'] {
+    background-color: var(--color-tile-8);
+    color: var(--color-tile-8-text);
+}
+
+.chip[data-value='16'] {
+    background-color: var(--color-tile-16);
+    color: var(--color-tile-16-text);
+}
+
+.chip[data-value='32'] {
+    background-color: var(--color-tile-32);
+    color: var(--color-tile-32-text);
+}
+
+.chip[data-value='64'] {
+    background-color: var(--color-tile-64);
+    color: var(--color-tile-64-text);
+}
+
+.chip[data-value='128'],
+.chip[data-value='256'],
+.chip[data-value='512'],
+.chip[data-value='1024'],
+.chip[data-value='2048'] {
+    box-shadow: var(--color-tile-shadow-glow);
+}
+
+.chip[data-value='128'] {
+    background-color: var(--color-tile-128);
+    color: var(--color-tile-128-text);
+}
+
+.chip[data-value='256'] {
+    background-color: var(--color-tile-256);
+    color: var(--color-tile-256-text);
+}
+
+.chip[data-value='512'] {
+    background-color: var(--color-tile-512);
+    color: var(--color-tile-512-text);
+}
+
+.chip[data-value='1024'] {
+    background-color: var(--color-tile-1024);
+    color: var(--color-tile-1024-text);
+}
+
+.chip[data-value='2048'] {
+    background-color: var(--color-tile-2048);
+    color: var(--color-tile-2048-text);
+}
+
+.chip:not([data-value='2']):not([data-value='4']):not([data-value='8']):not([data-value='16']):not([data-value='32']):not([data-value='64']):not([data-value='128']):not([data-value='256']):not([data-value='512']):not([data-value='1024']):not([data-value='2048']) {
+    background-color: var(--color-tile-default);
+    color: var(--color-tile-default-text);
+}
