@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme='default'] {
     /* Поверхности */
     --color-bg: #f0fff0;
     --color-board: #35495e;

@@ -35,20 +35,38 @@
     <slot
         name="controls"
         :game-started="gameStarted"
-        :sizes="sizes"
-        :size="size"
-        @update:size="onSizeChange"
+        :show-settings="showSettings"
+        @open-settings="openSettings"
         @start="startGame"
         @end="gameStarted = false"
     >
       <component
           :is="C.GameControls"
           :game-started="gameStarted"
-          :sizes="sizes"
-          :model-value="size"
-          @update:model-value="onSizeChange"
+          @open-settings="openSettings"
           @start="startGame"
           @end="gameStarted = false"
+      />
+    </slot>
+
+    <slot
+        name="settings"
+        :visible="showSettings"
+        :sizes="sizes"
+        :board-size="size"
+        :color-theme="appSettings.theme"
+        :game-started="gameStarted"
+        @close="closeSettings"
+        @save="onSettingsSave"
+    >
+      <AppSettings
+          :visible="showSettings"
+          :sizes="sizes"
+          :board-size="size"
+          :color-theme="appSettings.theme"
+          :game-started="gameStarted"
+          @close="closeSettings"
+          @save="onSettingsSave"
       />
     </slot>
 
@@ -126,6 +144,8 @@ import {useAppComponents} from './composables/useAppComponents.js'
 import {useAwardAnimation} from './composables/useAwardAnimation.js'
 import {useGamePersistence} from './composables/useGamePersistence.js'
 import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
+import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
+import AppSettings from './components/AppSettings.vue'
 
 const preset = useGamePreset()
 const C = useAppComponents()
@@ -146,7 +166,12 @@ for (const s of sizes) {
   awards[a] = {aim: a, obtained: false}
 }
 
-const {loadState, persistState} = useGamePersistence(preset, {awards, bestScore})
+const appSettings = reactive({
+  size: defSize,
+  theme: normalizeUiThemeId(preset.theme),
+})
+
+const {loadState, persistState} = useGamePersistence(preset, {awards, bestScore, settings: appSettings})
 
 const scoreContainerRef = ref(null)
 const gameRef = ref(null)
@@ -154,6 +179,7 @@ const collectAllBannerRef = ref(null)
 const awardRefs = ref({})
 
 const size = ref(defSize)
+const showSettings = ref(false)
 const gameStarted = ref(false)
 const gameEnded = ref(false)
 const gameAim = ref(getWinTile(preset, defSize))
@@ -186,8 +212,29 @@ function replayCollectAllBanner() {
   collectAllBannerRef.value?.replay?.()
 }
 
-function onSizeChange(v) {
-  size.value = v
+function openSettings() {
+  showSettings.value = true
+}
+
+function closeSettings() {
+  showSettings.value = false
+}
+
+function onSettingsSave({boardSize, colorTheme, resetGame}) {
+  if (resetGame) {
+    gameStarted.value = false
+    gameEnded.value = false
+    gameAimReached.value = false
+    score.value = 0
+  }
+
+  size.value = boardSize
+  appSettings.size = boardSize
+  appSettings.theme = colorTheme
+  applyUiTheme(colorTheme)
+  gameAim.value = getWinTile(preset, boardSize)
+  showSettings.value = false
+  persistState()
 }
 
 function startGame() {
@@ -276,6 +323,11 @@ watch(size, () => {
 
 onMounted(() => {
   loadState()
+  const savedSize = sizes.includes(appSettings.size) ? appSettings.size : defSize
+  size.value = savedSize
+  appSettings.size = savedSize
+  gameAim.value = getWinTile(preset, savedSize)
+  applyUiTheme(appSettings.theme)
   requestAnimationFrame(() => {
     isVisible.value = true
     if (features.collectAllBanner) {

@@ -1,7 +1,7 @@
 /**
  * Классическая палитра 2048 в тёмном режиме.
  */
-:root {
+[data-theme='classic-dark'] {
     /* Поверхности */
     --color-bg: #1a1a1a;
     --color-board: #3c3a32;

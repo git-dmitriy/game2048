@@ -1,7 +1,7 @@
 /**
  * Классическая палитра оригинальной игры 2048 (Gabriele Cirulli).
  */
-:root {
+[data-theme='classic'] {
     /* Поверхности */
     --color-bg: #faf8ef;
     --color-board: #bbada0;
