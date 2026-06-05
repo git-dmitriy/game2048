@@ -11,8 +11,17 @@ export const defaultPreset = {
     components: {},
 
     board: {
-        defaultSize: 4, defaultWidthPx: 420, /** innerWidth < defaultWidthPx * ratio → уменьшаем доску */
-        mobileBreakpointRatio: 1.04, mobileWidthRatio: 0.96,
+        defaultSize: 4,
+        defaultWidthPx: 420,
+        minWidthPx: 280,
+        maxWidthPx: 420,
+        /** Доля viewport по ширине (clamp в CSS: min(ratio * 100vw, maxWidthPx)) */
+        horizontalWidthRatio: 0.96,
+        /** Отступ сверху/снизу при расчёте лимита по высоте (px) */
+        layoutVerticalPaddingPx: 32,
+        /** @deprecated оставлено для обратной совместимости пресетов */
+        mobileBreakpointRatio: 1.04,
+        mobileWidthRatio: 0.96,
     },
 
     layout: {

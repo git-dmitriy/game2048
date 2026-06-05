@@ -95,8 +95,8 @@ function chipKey(ch) {
 }
 
 const boardStyle = computed(() => ({
-  width: props.boardSizePx > 0 ? props.boardSizePx + 'px' : '100%',
-  height: props.boardSizePx > 0 ? props.boardSizePx + 'px' : '100%',
+  width: '100%',
+  height: '100%',
   borderRadius: 7 / props.size + '%'
 }))
 
@@ -117,6 +117,12 @@ const cellSizePx = computed(() => {
 
 let keydownCleanup = null
 let swipeDetach = null
+
+watch(() => props.boardSizePx, (px) => {
+  if (px > 0) {
+    boardSizeAutoPx.value = px
+  }
+})
 
 watch(() => props.size, () => {
   cells.value = createCellsArray()

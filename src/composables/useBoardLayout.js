@@ -1,4 +1,4 @@
-import {ref, computed, onMounted, onUnmounted} from 'vue'
+import {ref, computed, watch, onUnmounted} from 'vue'
 
 export const defaultLayoutRatios = {
     controlsHeight: 0.2,
@@ -15,28 +15,58 @@ export const defaultLayoutRatios = {
 }
 
 /**
- * Масштаб доски и CSS-переменные layout для корня приложения.
+ * Суммарная доля высоты UI относительно доски (доска = 1).
+ * Учитывает панели из layout.ratios и опциональные блоки из features.
  * @param {import('../config/defaultPreset.js').defaultPreset} preset
  */
-export function useBoardLayout(preset) {
+export function getVerticalOverheadRatio(preset) {
+    const ratios = {...defaultLayoutRatios, ...preset.layout?.ratios}
+    const {features} = preset
+    let overhead = 1 + ratios.scoreHeight + ratios.controlsHeight
+
+    if (features.awards) {
+        overhead += ratios.awardsHeight + 0.02
+    }
+    if (features.collectAllBanner) {
+        overhead += 0.04
+    }
+
+    overhead += 0.04
+    return overhead
+}
+
+/**
+ * Масштаб доски: CSS clamp задаёт визуальный размер, ResizeObserver синхронизирует px для анимаций.
+ * @param {import('../config/defaultPreset.js').defaultPreset} preset
+ * @param {import('vue').Ref<HTMLElement | null>} [containerRef] — .game-container
+ */
+export function useBoardLayout(preset, containerRef) {
     const board = preset.board
     const ratios = {...defaultLayoutRatios, ...preset.layout?.ratios}
 
-    const boardSizePx = ref(board.defaultWidthPx)
+    const minPx = board.minWidthPx ?? 280
+    const maxPx = board.maxWidthPx ?? board.defaultWidthPx ?? 420
+    const widthRatio = board.horizontalWidthRatio ?? board.mobileWidthRatio ?? 0.96
+    const verticalPaddingPx = board.layoutVerticalPaddingPx ?? 32
+    const verticalOverhead = getVerticalOverheadRatio(preset)
 
-    function fitBoardSizePx() {
-        if (window.innerWidth < board.defaultWidthPx * board.mobileBreakpointRatio) {
-            boardSizePx.value = window.innerWidth * board.mobileWidthRatio
-        } else {
-            boardSizePx.value = board.defaultWidthPx
-        }
-    }
+    /** 0 до первого измерения ResizeObserver; layoutVars до измерения использует maxPx */
+    const boardSizePx = ref(0)
+    let resizeObserver = null
+    let resizeFallbackHandler = null
+
+    const sizingVars = computed(() => ({
+        '--board-min': minPx + 'px',
+        '--board-max': maxPx + 'px',
+        '--board-width-cap': `min(${widthRatio * 100}vw, ${maxPx}px)`,
+        '--vertical-overhead': String(verticalOverhead),
+        '--layout-vertical-padding': verticalPaddingPx + 'px',
+    }))
 
     const layoutVars = computed(() => {
-        const px = boardSizePx.value
+        const px = boardSizePx.value > 0 ? boardSizePx.value : maxPx
         const shadowOffset = px / ratios.gameAimShadowDivisor + 'px'
         return {
-            '--board-size': px + 'px',
             '--controls-height': px * ratios.controlsHeight + 'px',
             '--score-panel-height': px * ratios.scoreHeight + 'px',
             '--awards-height': px * ratios.awardsHeight + 'px',
@@ -51,14 +81,58 @@ export function useBoardLayout(preset) {
         }
     })
 
-    onMounted(() => {
-        fitBoardSizePx()
-        window.addEventListener('resize', fitBoardSizePx)
-    })
+    function syncBoardSizeFromElement(el) {
+        const w = el?.getBoundingClientRect().width
+        if (w > 0) {
+            boardSizePx.value = Math.round(w)
+        }
+    }
+
+    function attachResizeFallback(el) {
+        if (resizeFallbackHandler) return
+
+        resizeFallbackHandler = () => syncBoardSizeFromElement(el)
+        window.addEventListener('resize', resizeFallbackHandler)
+    }
+
+    function observeContainer(el) {
+        resizeObserver?.disconnect()
+        resizeObserver = null
+
+        if (!el) return
+
+        syncBoardSizeFromElement(el)
+
+        if (typeof ResizeObserver === 'undefined') {
+            attachResizeFallback(el)
+            return
+        }
+
+        resizeObserver = new ResizeObserver((entries) => {
+            const w = entries[0]?.contentRect?.width
+            if (w > 0) {
+                boardSizePx.value = Math.round(w)
+            }
+        })
+        resizeObserver.observe(el)
+    }
+
+    if (containerRef) {
+        watch(
+            containerRef,
+            (el) => observeContainer(el),
+            {flush: 'post', immediate: true},
+        )
+    }
 
     onUnmounted(() => {
-        window.removeEventListener('resize', fitBoardSizePx)
+        resizeObserver?.disconnect()
+        resizeObserver = null
+        if (resizeFallbackHandler) {
+            window.removeEventListener('resize', resizeFallbackHandler)
+            resizeFallbackHandler = null
+        }
     })
 
-    return {boardSizePx, layoutVars, fitBoardSizePx}
+    return {boardSizePx, sizingVars, layoutVars}
 }

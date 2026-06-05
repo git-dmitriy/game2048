@@ -2,7 +2,7 @@
   <div
       ref="appEl"
       class="main-container appearing"
-      :style="[layoutVars, { visibility: isVisible ? 'visible' : 'hidden' }]"
+      :style="[sizingVars, layoutVars, { visibility: isVisible ? 'visible' : 'hidden' }]"
   >
     <slot
         name="header"
@@ -52,7 +52,7 @@
       />
     </slot>
 
-    <div class="game-container">
+    <div ref="gameContainerEl" class="game-container">
       <slot name="overlay" :game-ended="gameEnded">
         <component :is="C.GameOverlay" :visible="gameEnded"/>
       </slot>
@@ -130,7 +130,8 @@ import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 const preset = useGamePreset()
 const C = useAppComponents()
 const {board, timing, features, input} = preset
-const {boardSizePx, layoutVars, fitBoardSizePx} = useBoardLayout(preset)
+const gameContainerEl = ref(null)
+const {boardSizePx, sizingVars, layoutVars} = useBoardLayout(preset, gameContainerEl)
 const {play: playAwardAnimation} = useAwardAnimation(preset)
 
 const defSize = board.defaultSize
@@ -276,31 +277,40 @@ watch(size, () => {
 onMounted(() => {
   loadState()
   requestAnimationFrame(() => {
-    fitBoardSizePx()
-    requestAnimationFrame(() => {
-      isVisible.value = true
-      if (features.collectAllBanner) {
-        replayCollectAllBanner()
-      }
-    })
+    isVisible.value = true
+    if (features.collectAllBanner) {
+      replayCollectAllBanner()
+    }
   })
 })
 </script>
 
 <style scoped>
 .main-container {
+  --board-size: clamp(
+      var(--board-min),
+      min(
+          var(--board-width-cap),
+          calc((100dvh - var(--layout-vertical-padding)) / var(--vertical-overhead)),
+          calc((100vh - var(--layout-vertical-padding)) / var(--vertical-overhead)),
+          var(--board-max)
+      ),
+      var(--board-max)
+  );
   display: flex;
   flex-direction: column;
   margin: 0 auto;
   padding: 2%;
   width: var(--board-size);
+  max-width: 100vw;
   transform: translateZ(0);
 }
 
 .game-container {
   position: relative;
-  width: var(--board-size);
-  height: var(--board-size);
+  width: 100%;
+  aspect-ratio: 1;
+  flex-shrink: 0;
 }
 
 .game-awards-container {

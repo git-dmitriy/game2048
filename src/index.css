@@ -1,3 +1,7 @@
+html {
+    height: 100%;
+}
+
 body,
 html {
     font-family: var(--font-family);
@@ -5,4 +9,12 @@ html {
     font-size: 18px;
     margin: 0;
     background-color: var(--color-bg);
+}
+
+body {
+    overscroll-behavior-y: contain;
+    min-height: 100%;
+    overflow-x: hidden;
+    display: grid;
+    place-items: center;
 }
