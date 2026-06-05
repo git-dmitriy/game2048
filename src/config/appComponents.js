@@ -1,17 +1,15 @@
-import ScoreContainer from '../components/ScoreContainer.vue'
-import GameControls from '../components/GameControls.vue'
+import GameAimHeader from '../components/GameAimHeader.vue'
+import GameToolbar from '../components/GameToolbar.vue'
 import GameOverlay from '../components/GameOverlay.vue'
 import GameBoard from '../components/GameBoard.vue'
 import GameAward from '../components/GameAward.vue'
-import CollectAllBanner from '../components/CollectAllBanner.vue'
 
 export const defaultAppComponents = {
-    ScoreContainer,
-    GameControls,
+    GameAimHeader,
+    GameToolbar,
     GameOverlay,
     GameBoard,
     GameAward,
-    CollectAllBanner,
 }
 
 export function resolveAppComponents(preset) {

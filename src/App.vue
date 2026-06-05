@@ -4,49 +4,93 @@
       class="main-container appearing"
       :style="[sizingVars, layoutVars, { visibility: isVisible ? 'visible' : 'hidden' }]"
   >
-    <slot
-        name="header"
-        :score="score"
-        :score-inc="scoreInc"
-        :best-score="bestScore[size]"
-        :game-aim="gameAim"
-        :game-aim-reached="gameAimReached"
-    />
+    <div class="layout-row layout-row-aim">
+      <slot
+          name="aim"
+          :game-aim="gameAim"
+          :game-aim-reached="gameAimReached"
+      >
+        <component
+            :is="C.GameAimHeader"
+            ref="gameAimHeaderRef"
+            :game-aim="gameAim"
+            :game-aim-reached="gameAimReached"
+        />
+      </slot>
+    </div>
 
-    <slot
-        name="score"
-        :score="score"
-        :score-inc="scoreInc"
-        :best-score="bestScore[size]"
-        :game-aim="gameAim"
-        :game-aim-reached="gameAimReached"
-    >
-      <component
-          :is="C.ScoreContainer"
-          ref="scoreContainerRef"
+    <div class="layout-row layout-row-toolbar">
+      <slot
+          name="toolbar"
           :score="score"
           :score-inc="scoreInc"
           :best-score="bestScore[size]"
-          :game-aim="gameAim"
-          :game-aim-reached="gameAimReached"
-      />
-    </slot>
-
-    <slot
-        name="controls"
-        :game-started="gameStarted"
-        :show-settings="showSettings"
-        @open-settings="openSettings"
-        @start="startGame"
-        @end="gameStarted = false"
-    >
-      <component
-          :is="C.GameControls"
           :game-started="gameStarted"
           @open-settings="openSettings"
           @start="startGame"
           @end="gameStarted = false"
-      />
+      >
+        <component
+            :is="C.GameToolbar"
+            :score="score"
+            :score-inc="scoreInc"
+            :best-score="bestScore[size]"
+            :game-started="gameStarted"
+            @open-settings="openSettings"
+            @start="startGame"
+            @end="gameStarted = false"
+        />
+      </slot>
+    </div>
+
+    <div class="layout-row layout-row-board">
+      <div ref="gameContainerEl" class="game-container">
+        <slot name="overlay" :game-ended="gameEnded">
+          <component :is="C.GameOverlay" :visible="gameEnded"/>
+        </slot>
+
+        <slot
+            name="board"
+            :size="size"
+            :game-started="gameStarted"
+            :board-size-px="boardSizePx"
+        >
+          <component
+              :is="C.GameBoard"
+              ref="gameRef"
+              :size="size"
+              :listen-own-key-events-only="listenOwnKeyEventsOnly"
+              :tab-index="1"
+              :board-size-px="boardSizePx"
+              :started="gameStarted"
+              :animation-time-ms="timing.animationMs"
+              :move-duration-ms="timing.moveMs"
+              :move-easing="timing.moveEasing"
+              @started="onGameStarted"
+              @ended="onGameEnded"
+              @score="onGameScore"
+              @aim-changed="onGameAimChanged"
+              @aim-reached="onGameAimReached"
+          />
+        </slot>
+      </div>
+    </div>
+
+    <slot
+        v-if="features.awards"
+        name="awards"
+        :awards-list="awardsList"
+        :set-award-ref="setAwardRef"
+    >
+      <div class="game-awards-container">
+        <component
+            :is="C.GameAward"
+            v-for="a in awardsList"
+            :ref="(el) => setAwardRef(el, a.aim)"
+            :key="a.aim"
+            :award="a"
+        />
+      </div>
     </slot>
 
     <slot
@@ -69,69 +113,6 @@
           @save="onSettingsSave"
       />
     </slot>
-
-    <div ref="gameContainerEl" class="game-container">
-      <slot name="overlay" :game-ended="gameEnded">
-        <component :is="C.GameOverlay" :visible="gameEnded"/>
-      </slot>
-
-      <slot
-          name="board"
-          :size="size"
-          :game-started="gameStarted"
-          :board-size-px="boardSizePx"
-      >
-        <component
-            :is="C.GameBoard"
-            ref="gameRef"
-            :size="size"
-            :listen-own-key-events-only="listenOwnKeyEventsOnly"
-            :tab-index="1"
-            :board-size-px="boardSizePx"
-            :started="gameStarted"
-            :animation-time-ms="timing.animationMs"
-            :move-duration-ms="timing.moveMs"
-            :move-easing="timing.moveEasing"
-            @started="onGameStarted"
-            @ended="onGameEnded"
-            @score="onGameScore"
-            @aim-changed="onGameAimChanged"
-            @aim-reached="onGameAimReached"
-        />
-      </slot>
-    </div>
-
-    <slot
-        v-if="features.awards"
-        name="awards"
-        :awards-list="awardsList"
-        :set-award-ref="setAwardRef"
-    >
-      <div class="game-awards-container">
-        <component
-            :is="C.GameAward"
-            v-for="a in awardsList"
-            :ref="(el) => setAwardRef(el, a.aim)"
-            :key="a.aim"
-            :award="a"
-        />
-      </div>
-    </slot>
-
-    <slot
-        v-if="features.collectAllBanner"
-        name="collect-all"
-        :all-obtained="allAwardsObtained"
-        :replay-banner="replayCollectAllBanner"
-    >
-      <component
-          :is="C.CollectAllBanner"
-          v-show="!allAwardsObtained"
-          ref="collectAllBannerRef"
-      />
-    </slot>
-
-    <slot name="footer"/>
   </div>
 </template>
 
@@ -173,9 +154,8 @@ const appSettings = reactive({
 
 const {loadState, persistState} = useGamePersistence(preset, {awards, bestScore, settings: appSettings})
 
-const scoreContainerRef = ref(null)
+const gameAimHeaderRef = ref(null)
 const gameRef = ref(null)
-const collectAllBannerRef = ref(null)
 const awardRefs = ref({})
 
 const size = ref(defSize)
@@ -190,13 +170,6 @@ const isVisible = ref(false)
 
 const awardsList = computed(() => Object.values(awards))
 
-const allAwardsObtained = computed(() => {
-  for (const key in awards) {
-    if (!awards[key].obtained) return false
-  }
-  return true
-})
-
 function setAwardRef(el, aim) {
   if (el) {
     awardRefs.value[aim] = el
@@ -204,12 +177,8 @@ function setAwardRef(el, aim) {
 }
 
 function getGameAimElement() {
-  const exposed = scoreContainerRef.value?.gameAimEl
+  const exposed = gameAimHeaderRef.value?.gameAimEl
   return exposed?.value ?? exposed ?? null
-}
-
-function replayCollectAllBanner() {
-  collectAllBannerRef.value?.replay?.()
 }
 
 function openSettings() {
@@ -240,9 +209,6 @@ function onSettingsSave({boardSize, colorTheme, resetGame}) {
 function startGame() {
   gameStarted.value = true
   score.value = 0
-  if (features.collectAllBanner) {
-    replayCollectAllBanner()
-  }
 }
 
 function onGameStarted() {
@@ -330,9 +296,6 @@ onMounted(() => {
   applyUiTheme(appSettings.theme)
   requestAnimationFrame(() => {
     isVisible.value = true
-    if (features.collectAllBanner) {
-      replayCollectAllBanner()
-    }
   })
 })
 </script>
@@ -351,6 +314,7 @@ onMounted(() => {
   );
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   margin: 0 auto;
   padding: 2%;
   width: var(--board-size);
@@ -358,18 +322,29 @@ onMounted(() => {
   transform: translateZ(0);
 }
 
+.layout-row {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.layout-row-toolbar {
+  height: var(--toolbar-height);
+}
+
+.layout-row-board {
+  flex-shrink: 0;
+}
+
 .game-container {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  flex-shrink: 0;
 }
 
 .game-awards-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 2%;
   height: var(--awards-height);
 }
 

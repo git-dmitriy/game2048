@@ -310,3 +310,4 @@ onMounted(() => {
   border-radius: 7%;
 }
 </style>
+

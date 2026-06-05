@@ -15,5 +15,6 @@ export const defaultStrings = {
     gameOver: 'Game over!',
     score: 'Score',
     best: 'Best',
-    collectAllAwards: 'Collect all awards!',
+    website: 'Portfolio website',
+    githubProfile: 'GitHub profile',
 }

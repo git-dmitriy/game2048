@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.4.0",
-    "gsap": "^3.12.0"
+    "@iconify/vue": "^5.0.1",
+    "gsap": "^3.12.0",
+    "vue": "^3.4.0"
   },
   "devDependencies": {
+    "@iconify-icons/mdi": "^1.2.48",
+    "@iconify-icons/simple-icons": "^1.2.74",
     "@vitejs/plugin-vue": "^5.0.0",
     "vite": "^5.0.0"
   }

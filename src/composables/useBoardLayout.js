@@ -1,44 +1,36 @@
 import {ref, computed, watch, onUnmounted} from 'vue'
 
 export const defaultLayoutRatios = {
-    controlsHeight: 0.2,
-    scoreHeight: 0.2,
     awardsHeight: 0.08,
+    toolbarHeight: 0.16,
     gameOverSizeDivisor: 6,
-    gameAimFontSizeDivisor: 110,
-    gameAimShadowDivisor: 50,
+    gameAimFontSizeDivisor: 85,
     buttonFontSizeDivisor: 450,
     scoreFontSizeDivisor: 280,
-    awardWidthDivisor: 5,
     awardFontSizeDivisor: 350,
     awardLikeHeightDivisor: 21,
+    awardWidthDivisor: 5,
 }
 
 /**
- * Суммарная доля высоты UI относительно доски (доска = 1).
- * Учитывает панели из layout.ratios и опциональные блоки из features.
  * @param {import('../config/defaultPreset.js').defaultPreset} preset
  */
 export function getVerticalOverheadRatio(preset) {
     const ratios = {...defaultLayoutRatios, ...preset.layout?.ratios}
     const {features} = preset
-    let overhead = 1 + ratios.scoreHeight + ratios.controlsHeight
+    let overhead = 1 + ratios.toolbarHeight
 
     if (features.awards) {
-        overhead += ratios.awardsHeight + 0.02
-    }
-    if (features.collectAllBanner) {
-        overhead += 0.04
+        overhead += ratios.awardsHeight
     }
 
-    overhead += 0.04
+    overhead += 0.07
     return overhead
 }
 
 /**
- * Масштаб доски: CSS clamp задаёт визуальный размер, ResizeObserver синхронизирует px для анимаций.
  * @param {import('../config/defaultPreset.js').defaultPreset} preset
- * @param {import('vue').Ref<HTMLElement | null>} [containerRef] — .game-container
+ * @param {import('vue').Ref<HTMLElement | null>} [containerRef]
  */
 export function useBoardLayout(preset, containerRef) {
     const board = preset.board
@@ -46,11 +38,10 @@ export function useBoardLayout(preset, containerRef) {
 
     const minPx = board.minWidthPx ?? 280
     const maxPx = board.maxWidthPx ?? board.defaultWidthPx ?? 420
-    const widthRatio = board.horizontalWidthRatio ?? board.mobileWidthRatio ?? 0.96
+    const widthRatio = board.horizontalWidthRatio ?? 0.96
     const verticalPaddingPx = board.layoutVerticalPaddingPx ?? 32
     const verticalOverhead = getVerticalOverheadRatio(preset)
 
-    /** 0 до первого измерения ResizeObserver; layoutVars до измерения использует maxPx */
     const boardSizePx = ref(0)
     let resizeObserver = null
     let resizeFallbackHandler = null
@@ -65,14 +56,12 @@ export function useBoardLayout(preset, containerRef) {
 
     const layoutVars = computed(() => {
         const px = boardSizePx.value > 0 ? boardSizePx.value : maxPx
-        const shadowOffset = px / ratios.gameAimShadowDivisor + 'px'
+
         return {
-            '--controls-height': px * ratios.controlsHeight + 'px',
-            '--score-panel-height': px * ratios.scoreHeight + 'px',
+            '--toolbar-height': px * ratios.toolbarHeight + 'px',
             '--awards-height': px * ratios.awardsHeight + 'px',
             '--game-over-font-size': px / ratios.gameOverSizeDivisor + 'px',
             '--game-aim-font-size': px / ratios.gameAimFontSizeDivisor + 'em',
-            '--game-aim-shadow': `0 ${shadowOffset} ${shadowOffset} var(--color-shadow)`,
             '--button-font-size': px / ratios.buttonFontSizeDivisor + 'em',
             '--score-font-size': px / ratios.scoreFontSizeDivisor + 'em',
             '--award-width': px / ratios.awardWidthDivisor + 'px',

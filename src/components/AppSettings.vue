@@ -18,9 +18,7 @@
               :aria-label="strings.cancel"
               @click="requestClose"
           >
-            <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            <Icon :icon="closeIcon" class="icon-close" aria-hidden="true"/>
           </button>
         </header>
 
@@ -90,7 +88,9 @@
 
 <script setup>
 import {ref, watch} from 'vue'
+import {Icon} from '@iconify/vue'
 import {useStrings} from '../composables/useStrings.js'
+import {closeIcon} from '../icons.js'
 import {UI_THEMES, normalizeUiThemeId} from '../config/themes.js'
 
 const strings = useStrings()
@@ -291,7 +291,7 @@ function confirmSave() {
 
 .settings-save {
   align-self: stretch;
-  min-height: calc(var(--controls-height) * 0.65);
+  min-height: calc(var(--toolbar-height) * 0.65);
   background-color: var(--color-board);
   border: none;
   border-radius: 8px;

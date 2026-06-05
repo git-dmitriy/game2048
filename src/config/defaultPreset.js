@@ -19,9 +19,6 @@ export const defaultPreset = {
         horizontalWidthRatio: 0.96,
         /** Отступ сверху/снизу при расчёте лимита по высоте (px) */
         layoutVerticalPaddingPx: 32,
-        /** @deprecated оставлено для обратной совместимости пресетов */
-        mobileBreakpointRatio: 1.04,
-        mobileWidthRatio: 0.96,
     },
 
     layout: {
@@ -47,7 +44,6 @@ export const defaultPreset = {
     features: {
         awards: true,
         bestScorePerSize: true,
-        collectAllBanner: true,
         scoreAnimation: 'gsap',
         awardAnimation: 'fly',
     },
