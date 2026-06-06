@@ -1,22 +1,22 @@
 <template>
   <div v-if="showPrompt()" class="pwa-update" role="status">
-    <p class="pwa-update-text">{{ strings.pwaUpdateAvailable }}</p>
+    <p class="pwa-update-text">{{ t('pwaUpdateAvailable') }}</p>
     <div class="pwa-update-actions">
       <button type="button" class="pwa-update-button pwa-update-later" @click="dismiss">
-        {{ strings.pwaLater }}
+        {{ t('pwaLater') }}
       </button>
       <button type="button" class="pwa-update-button pwa-update-apply" @click="applyUpdate">
-        {{ strings.pwaUpdate }}
+        {{ t('pwaUpdate') }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import {useStrings} from '../composables/useStrings.js'
+import {useI18n} from 'vue-i18n'
 import {usePwaUpdate} from '../composables/usePwaUpdate.js'
 
-const strings = useStrings()
+const {t} = useI18n()
 const {showPrompt, dismiss, applyUpdate} = usePwaUpdate()
 </script>
 

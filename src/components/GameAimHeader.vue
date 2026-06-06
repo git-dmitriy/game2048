@@ -14,7 +14,7 @@
           href="https://dmitriy-shalberkin.ru"
           target="_blank"
           rel="noopener noreferrer"
-          :aria-label="strings.website"
+          :aria-label="t('website')"
       >
         <Icon :icon="personIcon" class="game-aim-link-icon" aria-hidden="true"/>
       </a>
@@ -23,7 +23,7 @@
           href="https://github.com/git-dmitriy"
           target="_blank"
           rel="noopener noreferrer"
-          :aria-label="strings.githubProfile"
+          :aria-label="t('githubProfile')"
       >
         <Icon :icon="githubIcon" class="game-aim-link-icon" aria-hidden="true"/>
       </a>
@@ -34,10 +34,10 @@
 <script setup>
 import {ref} from 'vue'
 import {Icon} from '@iconify/vue'
-import {useStrings} from '../composables/useStrings.js'
+import {useI18n} from 'vue-i18n'
 import {personIcon, githubIcon} from '../icons.js'
 
-const strings = useStrings()
+const {t} = useI18n()
 
 defineProps({
   gameAim: {type: Number, required: true},

@@ -101,6 +101,7 @@
         :sizes="sizes"
         :board-size="size"
         :color-theme="appSettings.theme"
+        :locale="appSettings.locale"
         :game-started="gameStarted"
         @close="closeSettings"
         @save="onSettingsSave"
@@ -110,6 +111,7 @@
           :sizes="sizes"
           :board-size="size"
           :color-theme="appSettings.theme"
+          :locale="appSettings.locale"
           :game-started="gameStarted"
           @close="closeSettings"
           @save="onSettingsSave"
@@ -131,6 +133,7 @@ import {useGamePersistence} from './composables/useGamePersistence.js'
 import {useStartGameHint} from './composables/useStartGameHint.js'
 import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
+import {detectLocale, setAppLocale} from './i18n/index.js'
 import AppSettings from './components/AppSettings.vue'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt.vue'
 
@@ -156,6 +159,7 @@ for (const s of sizes) {
 const appSettings = reactive({
   size: defSize,
   theme: normalizeUiThemeId(preset.theme),
+  locale: detectLocale(),
 })
 
 const {loadState, persistState} = useGamePersistence(preset, {awards, bestScore, settings: appSettings})
@@ -202,7 +206,7 @@ function closeSettings() {
   showSettings.value = false
 }
 
-function onSettingsSave({boardSize, colorTheme, resetGame}) {
+function onSettingsSave({boardSize, colorTheme, locale, resetGame}) {
   if (resetGame) {
     gameStarted.value = false
     gameEnded.value = false
@@ -213,6 +217,7 @@ function onSettingsSave({boardSize, colorTheme, resetGame}) {
   size.value = boardSize
   appSettings.size = boardSize
   appSettings.theme = colorTheme
+  appSettings.locale = setAppLocale(locale)
   applyUiTheme(colorTheme)
   gameAim.value = getWinTile(preset, boardSize)
   showSettings.value = false
@@ -311,6 +316,7 @@ onMounted(() => {
   const savedSize = sizes.includes(appSettings.size) ? appSettings.size : defSize
   size.value = savedSize
   appSettings.size = savedSize
+  appSettings.locale = setAppLocale(appSettings.locale)
   gameAim.value = getWinTile(preset, savedSize)
   applyUiTheme(appSettings.theme)
   requestAnimationFrame(() => {

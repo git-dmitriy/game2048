@@ -1,7 +1,7 @@
 <template>
   <div class="game-toolbar">
     <div class="toolbar-item score-box">
-      <div class="score-label">{{ strings.score }}</div>
+      <div class="score-label">{{ t('score') }}</div>
       <div class="score-value">
         {{ score }}
         <Transition name="score-inc">
@@ -11,14 +11,14 @@
     </div>
 
     <div class="toolbar-item score-box">
-      <div class="score-label">{{ strings.best }}</div>
+      <div class="score-label">{{ t('best') }}</div>
       <div class="score-value">{{ bestScore }}</div>
     </div>
 
     <button
         type="button"
         class="toolbar-item toolbar-button toolbar-settings"
-        :aria-label="strings.settings"
+        :aria-label="t('settings')"
         @click="$emit('open-settings')"
     >
       <Icon :icon="settingsIcon" class="icon-gear" aria-hidden="true"/>
@@ -31,7 +31,7 @@
         :class="{ 'toolbar-primary--hint': highlightStart }"
         @click="$emit('start')"
     >
-      {{ strings.newGame }}
+      {{ t('newGame') }}
     </button>
     <button
         v-else
@@ -39,17 +39,17 @@
         class="toolbar-item toolbar-button toolbar-primary"
         @click="$emit('end')"
     >
-      {{ strings.end }}
+      {{ t('end') }}
     </button>
   </div>
 </template>
 
 <script setup>
+import {useI18n} from 'vue-i18n'
 import {Icon} from '@iconify/vue'
-import {useStrings} from '../composables/useStrings.js'
 import {settingsIcon} from '../icons.js'
 
-const strings = useStrings()
+const {t} = useI18n()
 
 defineProps({
   score: {type: Number, required: true},

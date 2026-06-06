@@ -12,12 +12,13 @@ import './themes/chips.css'
 import './index.css'
 import {activePreset} from './config/activePreset.js'
 import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
-import {gamePresetKey, tileThemeKey, stringsKey} from './config/injectionKeys.js'
+import {gamePresetKey, tileThemeKey} from './config/injectionKeys.js'
+import i18n from './i18n/index.js'
 
 applyUiTheme(normalizeUiThemeId(activePreset.theme))
 
 createApp(App)
+    .use(i18n)
     .provide(gamePresetKey, activePreset)
     .provide(tileThemeKey, activePreset.tileTheme)
-    .provide(stringsKey, activePreset.strings)
     .mount('#app')

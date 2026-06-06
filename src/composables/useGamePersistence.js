@@ -1,4 +1,5 @@
 import {normalizeUiThemeId} from '../config/themes.js'
+import {normalizeLocale} from '../i18n/index.js'
 
 const DEFAULT_STORAGE_KEY = 'game2048-state'
 
@@ -6,7 +7,7 @@ const DEFAULT_STORAGE_KEY = 'game2048-state'
  * @typedef {object} GamePersistedState
  * @property {Record<string, number>} [bestScore]
  * @property {Record<string, { aim: number, obtained: boolean }>} [awards]
- * @property {{ size?: number, theme?: string }} [settings]
+ * @property {{ size?: number, theme?: string, locale?: string }} [settings]
  */
 
 /**
@@ -58,7 +59,7 @@ export function saveGameState(preset, state) {
 /**
  * Загрузка / сохранение bestScore, awards и настроек в localStorage.
  * @param {object} preset
- * @param {{ awards: object, bestScore: object, settings?: { size?: number, theme?: string } }} stores
+ * @param {{ awards: object, bestScore: object, settings?: { size?: number, theme?: string, locale?: string } }} stores
  */
 export function useGamePersistence(preset, stores) {
     function buildState() {
@@ -72,6 +73,7 @@ export function useGamePersistence(preset, stores) {
             state.settings = {
                 size: stores.settings.size,
                 theme: stores.settings.theme,
+                locale: stores.settings.locale,
             }
         }
 
@@ -91,6 +93,9 @@ export function useGamePersistence(preset, stores) {
             }
             if (typeof state.settings.theme === 'string') {
                 stores.settings.theme = normalizeUiThemeId(state.settings.theme)
+            }
+            if (typeof state.settings.locale === 'string') {
+                stores.settings.locale = normalizeLocale(state.settings.locale)
             }
         }
     }

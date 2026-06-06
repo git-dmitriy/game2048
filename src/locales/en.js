@@ -1,10 +1,11 @@
-export const defaultStrings = {
+export default {
     sizeLabel: 'Size:',
     newGame: 'New Game',
     end: 'End',
     settings: 'Settings',
     boardSize: 'Board size',
     colorScheme: 'Color scheme',
+    language: 'Language',
     save: 'Save',
     confirm: 'Confirm',
     cancel: 'Cancel',

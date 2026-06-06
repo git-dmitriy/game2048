@@ -11,11 +11,11 @@
           @click.stop
       >
         <header class="settings-header">
-          <h2 :id="titleId" class="settings-title">{{ strings.settings }}</h2>
+          <h2 :id="titleId" class="settings-title">{{ t('settings') }}</h2>
           <button
               type="button"
               class="settings-close"
-              :aria-label="strings.cancel"
+              :aria-label="t('cancel')"
               @click="requestClose"
           >
             <Icon :icon="closeIcon" class="icon-close" aria-hidden="true"/>
@@ -23,7 +23,23 @@
         </header>
 
         <section class="settings-section">
-          <h3 class="settings-label">{{ strings.boardSize }}</h3>
+          <h3 class="settings-label">{{ t('language') }}</h3>
+          <div class="option-group">
+            <template v-for="localeId in localeOptions" :key="'locale-' + localeId">
+              <input
+                  :id="'settings-locale-' + localeId"
+                  v-model="draftLocale"
+                  type="radio"
+                  name="locale"
+                  :value="localeId"
+              />
+              <label :for="'settings-locale-' + localeId">{{ localeId.toUpperCase() }}</label>
+            </template>
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <h3 class="settings-label">{{ t('boardSize') }}</h3>
           <div class="option-group">
             <template v-for="s in sizes" :key="'size-' + s">
               <input
@@ -39,7 +55,7 @@
         </section>
 
         <section class="settings-section">
-          <h3 class="settings-label">{{ strings.colorScheme }}</h3>
+          <h3 class="settings-label">{{ t('colorScheme') }}</h3>
           <div class="option-group option-group-themes">
             <template v-for="theme in themes" :key="theme.id">
               <input
@@ -58,25 +74,25 @@
                       :style="{ backgroundColor: color }"
                   />
                 </span>
-                <span class="theme-label">{{ strings[theme.labelKey] }}</span>
+                <span class="theme-label">{{ t(theme.labelKey) }}</span>
               </label>
             </template>
           </div>
         </section>
 
         <button type="button" class="settings-save" @click="onSaveClick">
-          {{ strings.save }}
+          {{ t('save') }}
         </button>
 
         <div v-if="showResetConfirm" class="confirm-overlay" @click.stop>
           <div class="confirm-dialog">
-            <p class="confirm-message">{{ strings.settingsResetWarning }}</p>
+            <p class="confirm-message">{{ t('settingsResetWarning') }}</p>
             <div class="confirm-actions">
               <button type="button" class="confirm-button confirm-cancel" @click="showResetConfirm = false">
-                {{ strings.cancel }}
+                {{ t('cancel') }}
               </button>
               <button type="button" class="confirm-button confirm-ok" @click="confirmSave">
-                {{ strings.confirm }}
+                {{ t('confirm') }}
               </button>
             </div>
           </div>
@@ -88,13 +104,15 @@
 
 <script setup>
 import {ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {Icon} from '@iconify/vue'
-import {useStrings} from '../composables/useStrings.js'
 import {closeIcon} from '../icons.js'
 import {UI_THEMES, normalizeUiThemeId} from '../config/themes.js'
+import {LOCALE_OPTIONS, normalizeLocale} from '../i18n/index.js'
 
-const strings = useStrings()
+const {t} = useI18n()
 const themes = UI_THEMES
+const localeOptions = LOCALE_OPTIONS
 const titleId = 'app-settings-title'
 
 const props = defineProps({
@@ -102,6 +120,7 @@ const props = defineProps({
   sizes: {type: Array, required: true},
   boardSize: {type: Number, required: true},
   colorTheme: {type: String, required: true},
+  locale: {type: String, required: true},
   gameStarted: {type: Boolean, default: false},
 })
 
@@ -109,6 +128,7 @@ const emit = defineEmits(['close', 'save'])
 
 const draftSize = ref(props.boardSize)
 const draftTheme = ref(normalizeUiThemeId(props.colorTheme))
+const draftLocale = ref(normalizeLocale(props.locale))
 const showResetConfirm = ref(false)
 
 watch(() => props.visible, (open) => {
@@ -118,6 +138,7 @@ watch(() => props.visible, (open) => {
   }
   draftSize.value = props.boardSize
   draftTheme.value = normalizeUiThemeId(props.colorTheme)
+  draftLocale.value = normalizeLocale(props.locale)
 })
 
 function requestClose() {
@@ -141,6 +162,7 @@ function confirmSave() {
   emit('save', {
     boardSize: draftSize.value,
     colorTheme: normalizeUiThemeId(draftTheme.value),
+    locale: normalizeLocale(draftLocale.value),
     resetGame: needsResetConfirm(),
   })
   showResetConfirm.value = false

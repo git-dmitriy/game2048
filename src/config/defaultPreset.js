@@ -1,13 +1,11 @@
 import {createGame2048} from '../lib/game2048.js'
 import {defaultTileTheme} from './tileThemes/default.js'
 import {defaultLayoutRatios} from '../composables/useBoardLayout.js'
-import {defaultStrings} from './strings/default.js'
 
 export const defaultPreset = {
     id: 'default',
     theme: 'classic',
     tileTheme: defaultTileTheme,
-    strings: defaultStrings,
     components: {},
 
     board: {
@@ -108,7 +106,6 @@ export function createPreset(overrides = {}) {
     return {
         ...defaultPreset, ...overrides,
         tileTheme: overrides.tileTheme ?? defaultPreset.tileTheme,
-        strings: {...defaultPreset.strings, ...overrides.strings},
         components: {...defaultPreset.components, ...overrides.components},
         board: {...defaultPreset.board, ...overrides.board},
         layout: {

@@ -2,15 +2,15 @@
   <div v-if="visible" class="overlay-wrapper">
     <div class="overlay half-white appearing07"></div>
     <div class="overlay game-over appearing">
-      <p>{{ strings.gameOver }}</p>
+      <p>{{ t('gameOver') }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import {useStrings} from '../composables/useStrings.js'
+import {useI18n} from 'vue-i18n'
 
-const strings = useStrings()
+const {t} = useI18n()
 
 defineProps({
   visible: {type: Boolean, default: false},
