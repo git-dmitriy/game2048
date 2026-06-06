@@ -292,6 +292,7 @@ function confirmSave() {
 .settings-save {
   align-self: stretch;
   min-height: calc(var(--toolbar-height) * 0.65);
+  padding-block: 1rem;
   background-color: var(--color-board);
   border: none;
   border-radius: 8px;
