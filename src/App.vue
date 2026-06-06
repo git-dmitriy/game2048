@@ -115,6 +115,8 @@
           @save="onSettingsSave"
       />
     </slot>
+
+    <PwaUpdatePrompt/>
   </div>
 </template>
 
@@ -130,6 +132,7 @@ import {useStartGameHint} from './composables/useStartGameHint.js'
 import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
 import AppSettings from './components/AppSettings.vue'
+import PwaUpdatePrompt from './components/PwaUpdatePrompt.vue'
 
 const preset = useGamePreset()
 const C = useAppComponents()

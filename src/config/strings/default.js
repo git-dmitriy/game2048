@@ -22,4 +22,7 @@ export const defaultStrings = {
     best: 'Best',
     website: 'Portfolio website',
     githubProfile: 'GitHub profile',
+    pwaUpdateAvailable: 'A new version is available.',
+    pwaUpdate: 'Update',
+    pwaLater: 'Later',
 }
