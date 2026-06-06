@@ -224,15 +224,19 @@ function onGameEnded() {
 }
 
 function onGameScore(args) {
+  let bestScoreUpdated = false
+
   if (features.scoreAnimation !== 'gsap') {
     score.value = args.score
     if (features.bestScorePerSize && args.score > bestScore[size.value]) {
       bestScore[size.value] = args.score
+      bestScoreUpdated = true
     }
     scoreInc.value = args.scoreInc + '+'
     nextTick(() => {
       scoreInc.value = ''
     })
+    if (bestScoreUpdated) persistState()
     return
   }
 
@@ -255,6 +259,7 @@ function onGameScore(args) {
       onUpdate: () => {
         bestScore[size.value] = Math.floor(bs.score)
       },
+      onComplete: () => persistState(),
     })
   }
 

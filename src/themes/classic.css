@@ -1,6 +1,7 @@
 /**
  * Классическая палитра оригинальной игры 2048 (Gabriele Cirulli).
  */
+:root,
 [data-theme='classic'] {
     /* Поверхности */
     --color-bg: #faf8ef;
@@ -50,6 +51,16 @@
     --color-tile-1024-text: #f9f6f2;
     --color-tile-2048: #edc22e;
     --color-tile-2048-text: #f9f6f2;
+    --color-tile-4096: #ddb520;
+    --color-tile-4096-text: #f9f6f2;
+    --color-tile-8192: #cda818;
+    --color-tile-8192-text: #f9f6f2;
+    --color-tile-16384: #bd9b10;
+    --color-tile-16384-text: #f9f6f2;
+    --color-tile-32768: #ad8e0a;
+    --color-tile-32768-text: #f9f6f2;
+    --color-tile-65536: #9d8106;
+    --color-tile-65536-text: #f9f6f2;
     --color-tile-default: #3c3a32;
     --color-tile-default-text: #f9f6f2;
 

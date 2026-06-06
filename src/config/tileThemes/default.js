@@ -1,47 +1,43 @@
-const FONT_SIZE_COEFS = [1, 1, 0.8, 0.65, 0.5, 0.4, 0.35, 0.32]
-
-const TILE_PALETTE = {
-    2: {bg: '#87E293', color: 'white'},
-    4: {bg: '#87E273', color: 'white'},
-    8: {bg: '#eecf40', color: 'white'},
-    16: {bg: '#ffaa4f', color: 'white'},
-    32: {bg: '#6bcae2', color: 'white'},
-    64: {bg: '#9ebbee', color: 'white'},
-    128: {bg: 'white', color: '#2c3e50'},
-    default: {bg: 'white', color: '#2c3e50'},
+/**
+ * Коэффициент размера шрифта по степени двойки (2^power = value).
+ * Чем больше значение — тем меньше коэффициент, чтобы цифры влезали в ячейку.
+ */
+const FONT_SIZE_BY_POWER = {
+    1: 1,
+    2: 1,
+    3: 0.92,
+    4: 0.88,
+    5: 0.82,
+    6: 0.76,
+    7: 0.7,
+    8: 0.64,
+    9: 0.58,
+    10: 0.52,
+    11: 0.46,
+    12: 0.4,
+    13: 0.36,
+    14: 0.32,
+    15: 0.28,
+    16: 0.25,
 }
+
+const DEFAULT_FONT_COEF = 0.22
 
 export const defaultTileTheme = {
     id: 'default',
-    fontSizeCoefs: FONT_SIZE_COEFS,
+    fontSizeByPower: FONT_SIZE_BY_POWER,
 
-    getPalette(value) {
-        return TILE_PALETTE[value] ?? TILE_PALETTE.default
+    getFontSizeCoef(value) {
+        const power = Math.round(Math.log2(value))
+        return this.fontSizeByPower[power] ?? DEFAULT_FONT_COEF
     },
 
     getChipStyle(value, sizePx) {
-        const palette = this.getPalette(value)
-        const n = Math.floor(Math.log(value) / Math.log(10))
-        const base = Math.floor(sizePx / 1.5)
-        const coefs = this.fontSizeCoefs
-        const fontSize = base * (n < 8 ? coefs[n] : coefs[7])
-
-        let boxShadow
-        if (value < 256) {
-            const s = sizePx * 0.1 + 'px '
-            boxShadow = '0 ' + s + s + '0 black'
-        } else {
-            boxShadow =
-                '0 0 20px ' +
-                (2 + Math.min(10, Math.log(value) / Math.log(2) - 7)) +
-                'px white'
-        }
+        const coef = this.getFontSizeCoef(value)
+        const fontSize = Math.max(9, Math.floor((sizePx / 1.55) * coef))
 
         return {
             fontSize: fontSize + 'px',
-            backgroundColor: palette.bg,
-            color: palette.color,
-            boxShadow,
         }
     },
 }

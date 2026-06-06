@@ -5,7 +5,7 @@ import {defaultStrings} from './strings/default.js'
 
 export const defaultPreset = {
     id: 'default',
-    theme: 'default',
+    theme: 'classic',
     tileTheme: defaultTileTheme,
     strings: defaultStrings,
     components: {},
@@ -49,8 +49,8 @@ export const defaultPreset = {
     },
 
     persistence: {
-        /** 'cookie' | 'localStorage' | 'none' */
-        storage: 'cookie',
+        /** 'localStorage' | 'none' */
+        storage: 'localStorage',
         key: 'game2048-state',
     },
 

@@ -50,6 +50,16 @@
     --color-tile-1024-text: #f9f6f2;
     --color-tile-2048: #edc22e;
     --color-tile-2048-text: #f9f6f2;
+    --color-tile-4096: #d4af37;
+    --color-tile-4096-text: #f9f6f2;
+    --color-tile-8192: #c9a632;
+    --color-tile-8192-text: #f9f6f2;
+    --color-tile-16384: #be9d2d;
+    --color-tile-16384-text: #f9f6f2;
+    --color-tile-32768: #b39428;
+    --color-tile-32768-text: #f9f6f2;
+    --color-tile-65536: #a88b23;
+    --color-tile-65536-text: #f9f6f2;
     --color-tile-default: #2a2824;
     --color-tile-default-text: #f9f6f2;
 

@@ -9,5 +9,5 @@ export const activePreset = createPreset({
   // rules: { spawnsPerMove: 1, initialSpawns: 2 },
   // features: { awardAnimation: 'none' },
   // timing: { animationMs: 150, moveMs: 150 },
-  // persistence: { storage: 'localStorage', key: 'game2048-state' },
+  // persistence: { storage: 'none' },
 })
