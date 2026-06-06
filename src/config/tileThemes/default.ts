@@ -1,8 +1,6 @@
-/**
- * Коэффициент размера шрифта по степени двойки (2^power = value).
- * Чем больше значение — тем меньше коэффициент, чтобы цифры влезали в ячейку.
- */
-const FONT_SIZE_BY_POWER = {
+import type {TileTheme} from '../../types/game'
+
+const FONT_SIZE_BY_POWER: Record<number, number> = {
     1: 1,
     2: 1,
     3: 0.92,
@@ -23,16 +21,16 @@ const FONT_SIZE_BY_POWER = {
 
 const DEFAULT_FONT_COEF = 0.22
 
-export const defaultTileTheme = {
+export const defaultTileTheme: TileTheme = {
     id: 'default',
     fontSizeByPower: FONT_SIZE_BY_POWER,
 
-    getFontSizeCoef(value) {
+    getFontSizeCoef(value: number): number {
         const power = Math.round(Math.log2(value))
         return this.fontSizeByPower[power] ?? DEFAULT_FONT_COEF
     },
 
-    getChipStyle(value, sizePx) {
+    getChipStyle(value: number, sizePx: number): Record<string, string> {
         const coef = this.getFontSizeCoef(value)
         const fontSize = Math.max(9, Math.floor((sizePx / 1.55) * coef))
 

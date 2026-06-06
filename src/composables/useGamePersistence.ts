@@ -1,60 +1,46 @@
-import {isRef, unref, onMounted, onBeforeUnmount} from 'vue'
-import {normalizeUiThemeId} from '../config/themes.js'
-import {normalizeLocale} from '../i18n/index.js'
+import {isRef, unref, onMounted, onBeforeUnmount, type Ref} from 'vue'
+import {normalizeUiThemeId} from '../config/themes'
+import {normalizeLocale} from '../i18n'
+import type {
+    GameAwardState,
+    GamePersistedState,
+    GamePreset,
+    GameSession,
+    GameSettings,
+} from '../types/game'
 
 const DEFAULT_STORAGE_KEY = 'game2048-state'
 const PERSIST_DEBOUNCE_MS = 400
 
-/**
- * @typedef {import('../lib/gameSession.js').GameSession} GameSession
- */
+interface PersistenceStores {
+    awards: Record<string, GameAwardState>
+    bestScore: Record<string, number>
+    settings?: GameSettings
+    session?: GameSession | null | Ref<GameSession | null>
+}
 
-/**
- * @typedef {object} GamePersistedState
- * @property {Record<string, number>} [bestScore]
- * @property {Record<string, { aim: number, obtained: boolean }>} [awards]
- * @property {{ size?: number, theme?: string, locale?: string }} [settings]
- * @property {GameSession | null} [session]
- */
-
-/**
- * @param {object} preset
- * @returns {string}
- */
-function getStorageKey(preset) {
+function getStorageKey(preset: GamePreset): string {
     return preset.persistence?.key ?? DEFAULT_STORAGE_KEY
 }
 
-/**
- * @param {object} preset
- * @returns {boolean}
- */
-function isPersistenceEnabled(preset) {
+function isPersistenceEnabled(preset: GamePreset): boolean {
     return preset.persistence?.storage !== 'none'
 }
 
-/**
- * @param {object} preset
- * @returns {GamePersistedState | null}
- */
-export function loadGameState(preset) {
+export function loadGameState(preset: GamePreset): GamePersistedState | null {
     if (!isPersistenceEnabled(preset)) return null
 
     try {
         const raw = localStorage.getItem(getStorageKey(preset))
         if (!raw) return null
-        const state = JSON.parse(raw)
+        const state = JSON.parse(raw) as GamePersistedState
         return state && typeof state === 'object' ? state : null
     } catch {
         return null
     }
 }
 
-/**
- * @param {object} preset
- * @param {GamePersistedState} state
- */
-export function saveGameState(preset, state) {
+export function saveGameState(preset: GamePreset, state: GamePersistedState): void {
     if (!isPersistenceEnabled(preset)) return
 
     try {
@@ -63,24 +49,12 @@ export function saveGameState(preset, state) {
     }
 }
 
-/**
- * Загрузка / сохранение bestScore, awards и настроек в localStorage.
- * @param {object} preset
- * @param {{
- *   awards: object,
- *   bestScore: object,
- *   settings?: { size?: number, theme?: string, locale?: string },
- *   session?: GameSession | null,
- * }} stores
- */
-export function useGamePersistence(preset, stores) {
-    /** @type {ReturnType<typeof setTimeout> | null} */
-    let persistTimer = null
+export function useGamePersistence(preset: GamePreset, stores: PersistenceStores) {
+    let persistTimer: ReturnType<typeof setTimeout> | null = null
     let dirty = false
 
-    function buildState() {
-        /** @type {GamePersistedState} */
-        const state = {
+    function buildState(): GamePersistedState {
+        const state: GamePersistedState = {
             bestScore: {...stores.bestScore},
             awards: {...stores.awards},
         }
@@ -100,7 +74,7 @@ export function useGamePersistence(preset, stores) {
         return state
     }
 
-    function loadState() {
+    function loadState(): void {
         const state = loadGameState(preset)
         if (!state) return
 
@@ -129,7 +103,7 @@ export function useGamePersistence(preset, stores) {
         }
     }
 
-    function flushPersistState() {
+    function flushPersistState(): void {
         if (persistTimer) {
             clearTimeout(persistTimer)
             persistTimer = null
@@ -144,7 +118,7 @@ export function useGamePersistence(preset, stores) {
         dirty = false
     }
 
-    function persistState() {
+    function persistState(): void {
         if (!isPersistenceEnabled(preset)) return
 
         dirty = true
@@ -152,12 +126,12 @@ export function useGamePersistence(preset, stores) {
         persistTimer = setTimeout(flushPersistState, PERSIST_DEBOUNCE_MS)
     }
 
-    function flushOnExit() {
+    function flushOnExit(): void {
         if (!dirty) return
         flushPersistState()
     }
 
-    function clearSession() {
+    function clearSession(): void {
         if (stores.session === undefined) return
         if (isRef(stores.session)) {
             stores.session.value = null
@@ -183,7 +157,7 @@ export function useGamePersistence(preset, stores) {
         }
     })
 
-    function onVisibilityChange() {
+    function onVisibilityChange(): void {
         if (document.visibilityState === 'hidden') {
             flushOnExit()
         }

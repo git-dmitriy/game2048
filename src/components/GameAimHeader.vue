@@ -31,20 +31,20 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref} from 'vue'
 import {Icon} from '@iconify/vue'
 import {useI18n} from 'vue-i18n'
-import {personIcon, githubIcon} from '../icons.js'
+import {personIcon, githubIcon} from '../icons'
 
 const {t} = useI18n()
 
-defineProps({
-  gameAim: {type: Number, required: true},
-  gameAimReached: {type: Boolean, default: false},
-})
+defineProps<{
+  gameAim: number
+  gameAimReached?: boolean
+}>()
 
-const gameAimEl = ref(null)
+const gameAimEl = ref<HTMLElement | null>(null)
 defineExpose({gameAimEl})
 </script>
 

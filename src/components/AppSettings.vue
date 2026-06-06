@@ -102,29 +102,37 @@
   </Teleport>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref, watch} from 'vue'
 import {useI18n} from 'vue-i18n'
 import {Icon} from '@iconify/vue'
-import {closeIcon} from '../icons.js'
-import {UI_THEMES, normalizeUiThemeId} from '../config/themes.js'
-import {LOCALE_OPTIONS, normalizeLocale} from '../i18n/index.js'
+import {closeIcon} from '../icons'
+import {UI_THEMES, normalizeUiThemeId} from '../config/themes'
+import {LOCALE_OPTIONS, normalizeLocale} from '../i18n'
+import type {LocaleId, UiThemeId} from '../types/game'
+import type {SettingsSavePayload} from '../types/settings'
 
 const {t} = useI18n()
 const themes = UI_THEMES
 const localeOptions = LOCALE_OPTIONS
 const titleId = 'app-settings-title'
 
-const props = defineProps({
-  visible: {type: Boolean, default: false},
-  sizes: {type: Array, required: true},
-  boardSize: {type: Number, required: true},
-  colorTheme: {type: String, required: true},
-  locale: {type: String, required: true},
-  gameStarted: {type: Boolean, default: false},
+const props = withDefaults(defineProps<{
+  visible?: boolean
+  sizes: number[]
+  boardSize: number
+  colorTheme: UiThemeId | string
+  locale: LocaleId | string
+  gameStarted?: boolean
+}>(), {
+  visible: false,
+  gameStarted: false,
 })
 
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits<{
+  close: []
+  save: [payload: SettingsSavePayload]
+}>()
 
 const draftSize = ref(props.boardSize)
 const draftTheme = ref(normalizeUiThemeId(props.colorTheme))

@@ -12,9 +12,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {useI18n} from 'vue-i18n'
-import {usePwaUpdate} from '../composables/usePwaUpdate.js'
+import {usePwaUpdate} from '../composables/usePwaUpdate'
 
 const {t} = useI18n()
 const {showPrompt, dismiss, applyUpdate} = usePwaUpdate()

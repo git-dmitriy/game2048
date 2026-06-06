@@ -1,45 +1,49 @@
-const DEFAULT_OPTIONS = {
+import type {
+    CellCoord,
+    ChipCoord,
+    Game2048Engine,
+    Game2048MoveResult,
+    Game2048Options,
+} from '../types/game'
+
+type Cell = CellCoord & { value?: number }
+
+const DEFAULT_OPTIONS: Game2048Options = {
     spawnFourProbability: 0.2,
 }
 
-/**
- * @param {number} size
- * @param {object} [options]
- * @param {number} [options.spawnFourProbability]
- * @param {(random: () => number) => number} [options.spawnValue]
- */
-export function createGame2048(size, options = {}) {
-    size = size || 4
+export function createGame2048(size = 4, options: Game2048Options = {}): Game2048Engine {
     const opts = {...DEFAULT_OPTIONS, ...options}
+    const spawnFourProbability = opts.spawnFourProbability ?? 0.2
     const pickSpawnValue =
         opts.spawnValue ??
-        (() => (Math.random() < opts.spawnFourProbability ? 4 : 2))
+        (() => (Math.random() < spawnFourProbability ? 4 : 2))
 
     const size2 = size * size
     let score = 0
 
     const board = Array.from({length: size}, () =>
-        Array.from({length: size}, () => 0)
+        Array.from({length: size}, () => 0),
     )
 
-    function cellIsEmpty(c) {
+    function cellIsEmpty(c: Cell): boolean {
         return board[c.y][c.x] === 0
     }
 
-    function cellsEqual(c1, c2) {
+    function cellsEqual(c1: Cell, c2: Cell): boolean {
         return board[c1.y][c1.x] === board[c2.y][c2.x]
     }
 
-    function moveChip(cf, ct) {
+    function moveChip(cf: Cell, ct: Cell): number {
         const tWasEmpty = cellIsEmpty(ct)
         const v = (board[ct.y][ct.x] += board[cf.y][cf.x])
         board[cf.y][cf.x] = 0
         return tWasEmpty ? 0 : v
     }
 
-    function findRandomEmptyPos() {
+    function findRandomEmptyPos(): Cell | null {
         let r = Math.floor(Math.random() * size2)
-        const c = {}
+        const c: Cell = {x: 0, y: 0}
         for (let i = size2; i > 0; i--) {
             c.y = Math.floor(r / size)
             c.x = r % size
@@ -50,32 +54,33 @@ export function createGame2048(size, options = {}) {
         return null
     }
 
-    function rot0(c, x, y) {
+    function rot0(c: Cell, x: number, y: number): void {
         c.x = x
         c.y = y
     }
 
-    function rot90(c, x, y) {
+    function rot90(c: Cell, x: number, y: number): void {
         c.x = y
         c.y = x
     }
 
-    function rot180(c, x, y) {
+    function rot180(c: Cell, x: number, y: number): void {
         c.x = size - 1 - x
         c.y = y
     }
 
-    function rot270(c, x, y) {
+    function rot270(c: Cell, x: number, y: number): void {
         c.x = y
         c.y = size - 1 - x
     }
 
-    function move(rot) {
+    function move(rot: (c: Cell, x: number, y: number) => void): Game2048MoveResult {
         let scoreInc = 0
-        const moves = []
-        const consolidations = []
-        const c = {}
-        const tc = {}
+        const moves: Game2048MoveResult['moves'] = []
+        const consolidations: ChipCoord[] = []
+        const c: Cell = {x: 0, y: 0}
+        const tc: Cell = {x: 0, y: 0}
+
         for (let y = 0; y < size; y++) {
             let s = size
             for (let x = size - 2; x >= 0; x--) {
@@ -110,24 +115,24 @@ export function createGame2048(size, options = {}) {
                 }
             }
         }
+
         return {moves, consolidations, scoreInc}
     }
 
-    function turn() {
-        const chips = []
+    function turn(): ChipCoord[] {
+        const chips: ChipCoord[] = []
         const p = findRandomEmptyPos()
         if (p != null) {
             const v = pickSpawnValue(Math.random)
             p.value = v
             board[p.y][p.x] = v
-            chips.push(p)
+            chips.push({x: p.x, y: p.y, value: v})
         }
         return chips
     }
 
-    /** Несколько спавнов подряд (после хода или при старте) */
-    function spawnTiles(count) {
-        const chips = []
+    function spawnTiles(count: number): ChipCoord[] {
+        const chips: ChipCoord[] = []
         for (let i = 0; i < count; i++) {
             chips.push(...turn())
         }
@@ -141,12 +146,7 @@ export function createGame2048(size, options = {}) {
         }
     }
 
-    /**
-     * @param {number[][]} snapshotBoard
-     * @param {number} snapshotScore
-     * @returns {boolean}
-     */
-    function loadSnapshot(snapshotBoard, snapshotScore) {
+    function loadSnapshot(snapshotBoard: number[][], snapshotScore: number): boolean {
         if (!Array.isArray(snapshotBoard) || snapshotBoard.length !== size) {
             return false
         }
@@ -179,9 +179,10 @@ export function createGame2048(size, options = {}) {
         left: () => move(rot180),
         up: () => move(rot270),
         canMove() {
-            const c = {y: 0}
-            const cr = {y: 0}
-            const cb = {y: 1}
+            const c: Cell = {x: 0, y: 0}
+            const cr: Cell = {x: 0, y: 0}
+            const cb: Cell = {x: 0, y: 1}
+
             for (; c.y < size; c.y++, cr.y++, cb.y++) {
                 for (c.x = 0, cr.x = 1, cb.x = 0; c.x < size; c.x++, cr.x++, cb.x++) {
                     if (
@@ -193,6 +194,7 @@ export function createGame2048(size, options = {}) {
                     }
                 }
             }
+
             return false
         },
     }

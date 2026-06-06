@@ -1,8 +1,9 @@
-import {createGame2048} from '../lib/game2048.js'
-import {defaultTileTheme} from './tileThemes/default.js'
-import {defaultLayoutRatios} from '../composables/useBoardLayout.js'
+import {createGame2048} from '../lib/game2048'
+import type {Game2048Engine, Game2048Options, GamePreset} from '../types/game'
+import {defaultTileTheme} from './tileThemes/default'
+import {defaultLayoutRatios} from '../composables/useBoardLayout'
 
-export const defaultPreset = {
+export const defaultPreset: GamePreset = {
     id: 'default',
     theme: 'classic',
     tileTheme: defaultTileTheme,
@@ -13,9 +14,7 @@ export const defaultPreset = {
         defaultWidthPx: 420,
         minWidthPx: 280,
         maxWidthPx: 420,
-        /** Доля viewport по ширине (clamp в CSS: min(ratio * 100vw, maxWidthPx)) */
         horizontalWidthRatio: 0.96,
-        /** Отступ сверху/снизу при расчёте лимита по высоте (px) */
         layoutVerticalPaddingPx: 32,
     },
 
@@ -36,7 +35,9 @@ export const defaultPreset = {
     },
 
     timing: {
-        animationMs: 200, moveMs: 200, moveEasing: 'ease-out',
+        animationMs: 200,
+        moveMs: 200,
+        moveEasing: 'ease-out',
     },
 
     features: {
@@ -48,48 +49,47 @@ export const defaultPreset = {
     },
 
     persistence: {
-        /** 'localStorage' | 'none' */
         storage: 'localStorage',
         key: 'game2048-state',
     },
 
     input: {
-        listenKeysOn: 'document', swipeSensitivity: 5,
+        listenKeysOn: 'document',
+        swipeSensitivity: 5,
     },
 }
 
-export function getWinTile(preset, size) {
+export function getWinTile(preset: GamePreset, size: number): number {
     return preset.rules.winTileBySize[size] ?? 2048
 }
 
-
-export function getBoardSizes(preset) {
+export function getBoardSizes(preset: GamePreset): number[] {
     return Object.keys(preset.rules.winTileBySize)
         .map(Number)
         .sort((a, b) => a - b)
 }
 
-export function buildSizeAimMap(preset) {
-    const map = []
+export function buildSizeAimMap(preset: GamePreset): number[] {
+    const map: number[] = []
     for (const [size, aim] of Object.entries(preset.rules.winTileBySize)) {
         map[Number(size)] = aim
     }
     return map
 }
 
-export function getSpawnsPerMove(preset, size) {
+export function getSpawnsPerMove(preset: GamePreset, size: number): number {
     const rule = preset.rules.spawnsPerMove
     return typeof rule === 'function' ? rule(size) : (rule ?? 1)
 }
 
-export function getInitialSpawns(preset, size) {
+export function getInitialSpawns(preset: GamePreset, size: number): number {
     const rule = preset.rules.initialSpawns
     return typeof rule === 'function' ? rule(size) : (rule ?? 2)
 }
 
-export function getGame2048Options(preset) {
+export function getGame2048Options(preset: GamePreset): Game2048Options {
     const {rules} = preset
-    const options = {
+    const options: Game2048Options = {
         spawnFourProbability: rules.spawnFourProbability ?? 0.2,
     }
     if (typeof rules.spawnValue === 'function') {
@@ -98,13 +98,14 @@ export function getGame2048Options(preset) {
     return options
 }
 
-export function createGame2048FromPreset(preset, size) {
+export function createGame2048FromPreset(preset: GamePreset, size: number): Game2048Engine {
     return createGame2048(size, getGame2048Options(preset))
 }
 
-export function createPreset(overrides = {}) {
+export function createPreset(overrides: Partial<GamePreset> = {}): GamePreset {
     return {
-        ...defaultPreset, ...overrides,
+        ...defaultPreset,
+        ...overrides,
         tileTheme: overrides.tileTheme ?? defaultPreset.tileTheme,
         components: {...defaultPreset.components, ...overrides.components},
         board: {...defaultPreset.board, ...overrides.board},

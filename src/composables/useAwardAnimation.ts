@@ -1,7 +1,14 @@
-/**
- * @param {'fly' | 'pulse' | 'none'} policy
- */
-export function runAwardAnimation(policy, {awardEl, sourceEl}) {
+import type {AwardAnimation, GamePreset} from '../types/game'
+
+interface AwardAnimationTargets {
+    awardEl: HTMLElement | null | undefined
+    sourceEl: HTMLElement | null | undefined
+}
+
+export function runAwardAnimation(
+    policy: AwardAnimation | string,
+    {awardEl, sourceEl}: AwardAnimationTargets,
+): void {
     if (policy === 'none' || !awardEl || !sourceEl) {
         return
     }
@@ -29,10 +36,10 @@ export function runAwardAnimation(policy, {awardEl, sourceEl}) {
     }
 }
 
-export function useAwardAnimation(preset) {
+export function useAwardAnimation(preset: GamePreset) {
     const policy = preset.features?.awardAnimation ?? 'fly'
 
-    function play(targets) {
+    function play(targets: AwardAnimationTargets): void {
         runAwardAnimation(policy, targets)
     }
 

@@ -44,22 +44,29 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {useI18n} from 'vue-i18n'
 import {Icon} from '@iconify/vue'
-import {settingsIcon} from '../icons.js'
+import {settingsIcon} from '../icons'
 
 const {t} = useI18n()
 
-defineProps({
-  score: {type: Number, required: true},
-  scoreInc: {type: String, default: ''},
-  bestScore: {type: Number, required: true},
-  gameStarted: {type: Boolean, required: true},
-  highlightStart: {type: Boolean, default: false},
+withDefaults(defineProps<{
+  score: number
+  scoreInc?: string
+  bestScore: number
+  gameStarted: boolean
+  highlightStart?: boolean
+}>(), {
+  scoreInc: '',
+  highlightStart: false,
 })
 
-defineEmits(['open-settings', 'start', 'end'])
+defineEmits<{
+  'open-settings': []
+  start: []
+  end: []
+}>()
 </script>
 
 <style scoped>

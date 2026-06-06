@@ -26,48 +26,70 @@
   </div>
 </template>
 
-<script setup>
-import {ref, computed, watch, onMounted} from 'vue'
+<script setup lang="ts">
+import {ref, computed, watch, onMounted, type ComponentPublicInstance} from 'vue'
 import GameChip from './GameChip.vue'
-import {deferred} from '../lib/deferred.js'
-import {createSwipeListener} from '../lib/swipe.js'
-import {useGamePreset} from '../composables/useGamePreset.js'
+import {deferred} from '../lib/deferred'
+import {createSwipeListener} from '../lib/swipe'
+import {useGamePreset} from '../composables/useGamePreset'
 import {
   createGame2048FromPreset,
   getInitialSpawns,
   getSpawnsPerMove,
   getWinTile,
-} from '../config/defaultPreset.js'
+} from '../config/defaultPreset'
+import type {
+  BoardCell,
+  BoardChip,
+  CellCoord,
+  ChipCoord,
+  Game2048Engine,
+  Game2048Snapshot,
+  MoveDirection,
+} from '../types/game'
 
-const keyMap = {}
-keyMap[37] = 'left'
-keyMap[38] = 'up'
-keyMap[39] = 'right'
-keyMap[40] = 'down'
+const keyMap: Record<number, MoveDirection> = {
+  37: 'left',
+  38: 'up',
+  39: 'right',
+  40: 'down',
+}
 
 const preset = useGamePreset()
 
-const props = defineProps({
-  size: {type: Number, required: true},
-  listenOwnKeyEventsOnly: {type: Boolean, default: false},
-  tabIndex: {type: Number, default: 1},
-  boardSizePx: {type: Number, default: 0},
-  animationTimeMs: {type: Number, default: 150},
-  /** Длительность анимации движения плиток (мс). По умолчанию = animationTimeMs */
-  moveDurationMs: {type: Number, default: undefined},
-  /** Easing анимации движения (CSS: ease-out, linear, cubic-bezier(...) и т.д.) */
-  moveEasing: {type: String, default: 'ease-out'},
-  started: {type: Boolean, default: false}
+const props = withDefaults(defineProps<{
+  size: number
+  listenOwnKeyEventsOnly?: boolean
+  tabIndex?: number
+  boardSizePx?: number
+  animationTimeMs?: number
+  moveDurationMs?: number
+  moveEasing?: string
+  started?: boolean
+}>(), {
+  listenOwnKeyEventsOnly: false,
+  tabIndex: 1,
+  boardSizePx: 0,
+  animationTimeMs: 150,
+  moveEasing: 'ease-out',
+  started: false,
 })
 
-const emit = defineEmits(['started', 'ended', 'score', 'aim-changed', 'aim-reached', 'session-update'])
+const emit = defineEmits<{
+  started: []
+  ended: []
+  score: [payload: { score: number; scoreInc: number }]
+  'aim-changed': [aim: number]
+  'aim-reached': []
+  'session-update': [snapshot: Game2048Snapshot]
+}>()
 
-const boardEl = ref(null)
-const cellRefs = ref([])
+const boardEl = ref<HTMLElement | null>(null)
+const cellRefs = ref<HTMLElement[]>([])
 const boardSizeAutoPx = ref(0)
 
 const aim = ref(getWinTile(preset, props.size))
-const cells = ref(createCellsArray())
+const cells = ref<BoardCell[]>(createCellsArray())
 
 /** Уникальный id для каждой плитки при добавлении (чтобы ключ был стабильным до перемещения) */
 let chipIdCounter = 0
@@ -78,8 +100,8 @@ function createCellsArray() {
   return Array.from({length: props.size * props.size}, () => ({chips: []}))
 }
 
-function setCellRef(el, index) {
-  if (el) {
+function setCellRef(el: Element | ComponentPublicInstance | null, index: number) {
+  if (el instanceof HTMLElement) {
     if (!Array.isArray(cellRefs.value)) cellRefs.value = []
     cellRefs.value[index] = el
   }
@@ -89,7 +111,7 @@ function setCellRef(el, index) {
  * Ключ должен меняться при перемещении, иначе Vue переиспользует компонент и enter не вызывается.
  * При перемещении используем _moveKey (новый инстанс → анимация входа).
  */
-function chipKey(ch) {
+function chipKey(ch: BoardChip) {
   if (ch._moveKey != null) return 'move-' + ch._moveKey
   return 'chip-' + (ch._chipId != null ? ch._chipId : (ch._chipId = ++chipIdCounter))
 }
@@ -115,10 +137,9 @@ const cellSizePx = computed(() => {
   return (cellSizePct.value / 100) * boardPx
 })
 
-let keydownCleanup = null
-let swipeDetach = null
-/** @type {ReturnType<typeof createGame2048FromPreset> | null} */
-let game = null
+let keydownCleanup: (() => void) | null = null
+let swipeDetach: (() => void) | null = null
+let game: Game2048Engine | null = null
 let skipAutostart = false
 
 watch(() => props.boardSizePx, (px) => {
@@ -145,10 +166,13 @@ watch(() => props.started, (nv, ov) => {
   }
 })
 
-function runKeyboardControl(doGameMove) {
+function runKeyboardControl(doGameMove: (direction: MoveDirection) => void) {
   const listenKeysOn = props.listenOwnKeyEventsOnly ? boardEl.value : document
-  const h = (e) => {
-    const m = keyMap[e.keyCode]
+  if (!listenKeysOn) return
+
+  const h = (e: Event) => {
+    const ke = e as KeyboardEvent
+    const m = keyMap[ke.keyCode]
     if (m == null) return
     e.preventDefault()
     doGameMove(m)
@@ -159,7 +183,7 @@ function runKeyboardControl(doGameMove) {
   }
 }
 
-function runTouchControl(doGameMove) {
+function runTouchControl(doGameMove: (direction: MoveDirection) => void) {
   const sw = createSwipeListener((m) => doGameMove(m), {
     sensitivity: preset.input.swipeSensitivity,
   })
@@ -170,15 +194,15 @@ function runTouchControl(doGameMove) {
   }
 }
 
-function getCellIndex(c) {
+function getCellIndex(c: CellCoord) {
   return c.y * props.size + c.x
 }
 
-function getCell(c) {
+function getCell(c: CellCoord) {
   return cells.value[getCellIndex(c)]
 }
 
-function getCellEl(c) {
+function getCellEl(c: CellCoord) {
   const refs = cellRefs.value
   return Array.isArray(refs) ? refs[getCellIndex(c)] : null
 }
@@ -187,16 +211,16 @@ function emptyCells() {
   cells.value.forEach((c) => c.chips.splice(0))
 }
 
-function addChip(c) {
+function addChip(c: ChipCoord) {
   const chip = {value: c.value, _chipId: ++chipIdCounter}
   cells.value[getCellIndex(c)].chips.push(chip)
 }
 
-function addChips(chips) {
+function addChips(chips: ChipCoord[]) {
   chips.forEach(addChip)
 }
 
-function populateChipsFromBoard(board) {
+function populateChipsFromBoard(board: number[][]) {
   for (let y = 0; y < props.size; y++) {
     for (let x = 0; x < props.size; x++) {
       const value = board[y][x]
@@ -212,7 +236,7 @@ function emitSessionUpdate() {
   emit('session-update', game.getSnapshot())
 }
 
-function moveChip(from, to) {
+function moveChip(from: CellCoord, to: CellCoord) {
   const fcell = getCell(from)
   const fcellEl = getCellEl(from)
   const tcell = getCell(to)
@@ -229,11 +253,11 @@ function moveChip(from, to) {
   tcell.chips.push(chip)
 }
 
-function moveChips(moves) {
+function moveChips(moves: Array<{ from: CellCoord; to: CellCoord }>) {
   moves.forEach((m) => moveChip(m.from, m.to))
 }
 
-function consolidateChips(consolidations) {
+function consolidateChips(consolidations: ChipCoord[]) {
   consolidations.forEach((c) => {
     const cell = getCell(c)
     const chips = cell.chips
@@ -242,9 +266,12 @@ function consolidateChips(consolidations) {
   })
 }
 
-function createGameMove(game) {
-  const boardChanges = {moves: [], consolidations: []}
-  const newChips = []
+function createGameMove(game: Game2048Engine) {
+  const boardChanges: {
+    moves: Array<{ from: CellCoord; to: CellCoord }>
+    consolidations: ChipCoord[]
+  } = {moves: [], consolidations: []}
+  const newChips: ChipCoord[] = []
   const moveDuration = props.moveDurationMs ?? props.animationTimeMs
   /** Не принимаем новый ход, пока не закончится анимация движения текущего хода */
   let moveCooldownUntil = 0
@@ -254,7 +281,7 @@ function createGameMove(game) {
     addChips(newChips)
   })
 
-  return function (m) {
+  return function (m: MoveDirection) {
     if (Date.now() < moveCooldownUntil) return
 
     consolidateAndAddChipsDeferred.finish()
@@ -290,7 +317,7 @@ function createGameMove(game) {
   }
 }
 
-function attachControls(doGameMove) {
+function attachControls(doGameMove: (direction: MoveDirection) => void) {
   runKeyboardControl(doGameMove)
   runTouchControl(doGameMove)
 }
@@ -306,11 +333,10 @@ function startGame() {
   emit('started')
 }
 
-/**
- * @param {{ board: number[][], score: number }} session
- * @param {{ interactive?: boolean }} [options]
- */
-function restoreSession(session, options = {}) {
+function restoreSession(
+    session: { board: number[][]; score: number },
+    options: { interactive?: boolean } = {},
+) {
   const interactive = options.interactive !== false
 
   endGame()

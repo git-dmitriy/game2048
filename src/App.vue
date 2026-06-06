@@ -89,7 +89,7 @@
         <component
             :is="C.GameAward"
             v-for="a in awardsList"
-            :ref="(el) => setAwardRef(el, a.aim)"
+            :ref="bindAwardRef(a.aim)"
             :key="a.aim"
             :award="a"
         />
@@ -123,34 +123,47 @@
   </div>
 </template>
 
-<script setup>
-import {ref, reactive, computed, watch, onMounted, nextTick} from 'vue'
+<script setup lang="ts">
+import {ref, reactive, computed, watch, onMounted, nextTick, type ComponentPublicInstance} from 'vue'
 import {gsap} from 'gsap'
-import {useGamePreset} from './composables/useGamePreset.js'
-import {useBoardLayout} from './composables/useBoardLayout.js'
-import {useAppComponents} from './composables/useAppComponents.js'
-import {useAwardAnimation} from './composables/useAwardAnimation.js'
-import {useGamePersistence} from './composables/useGamePersistence.js'
-import {useStartGameHint} from './composables/useStartGameHint.js'
-import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
-import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
-import {detectLocale, setAppLocale} from './i18n/index.js'
-import {isValidGameSession} from './lib/gameSession.js'
+import {useGamePreset} from './composables/useGamePreset'
+import {useBoardLayout} from './composables/useBoardLayout'
+import {useAppComponents} from './composables/useAppComponents'
+import {useAwardAnimation} from './composables/useAwardAnimation'
+import {useGamePersistence} from './composables/useGamePersistence'
+import {useStartGameHint} from './composables/useStartGameHint'
+import {getBoardSizes, getWinTile} from './config/defaultPreset'
+import {applyUiTheme, normalizeUiThemeId} from './config/themes'
+import {detectLocale, setAppLocale} from './i18n'
+import {isValidGameSession} from './lib/gameSession'
 import AppSettings from './components/AppSettings.vue'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt.vue'
+import type {GameAwardState, GameSession, UiThemeId} from './types/game'
+import type {SettingsSavePayload} from './types/settings'
+
+interface GameAimHeaderExpose {
+  gameAimEl: { value: HTMLElement | null } | HTMLElement | null
+}
+
+interface GameBoardExpose {
+  restoreSession: (
+      session: { board: number[][]; score: number },
+      options?: { interactive?: boolean },
+  ) => boolean
+}
 
 const preset = useGamePreset()
 const C = useAppComponents()
 const {board, timing, features, input} = preset
-const gameContainerEl = ref(null)
+const gameContainerEl = ref<HTMLElement | null>(null)
 const {boardSizePx, sizingVars, layoutVars} = useBoardLayout(preset, gameContainerEl)
 const {play: playAwardAnimation} = useAwardAnimation(preset)
 
 const defSize = board.defaultSize
 const listenOwnKeyEventsOnly = input.listenKeysOn === 'board'
 
-const awards = reactive({})
-const bestScore = reactive({})
+const awards = reactive<Record<number, GameAwardState>>({})
+const bestScore = reactive<Record<number, number>>({})
 const sizes = getBoardSizes(preset)
 for (const s of sizes) {
   const a = getWinTile(preset, s)
@@ -158,13 +171,17 @@ for (const s of sizes) {
   awards[a] = {aim: a, obtained: false}
 }
 
-const appSettings = reactive({
+const appSettings = reactive<{
+  size: number
+  theme: UiThemeId
+  locale: ReturnType<typeof detectLocale>
+}>({
   size: defSize,
   theme: normalizeUiThemeId(preset.theme),
   locale: detectLocale(),
 })
 
-const savedSession = ref(null)
+const savedSession = ref<GameSession | null>(null)
 const {loadState, persistState, flushPersistState, clearSession} = useGamePersistence(preset, {
   awards,
   bestScore,
@@ -172,9 +189,9 @@ const {loadState, persistState, flushPersistState, clearSession} = useGamePersis
   session: savedSession,
 })
 
-const gameAimHeaderRef = ref(null)
-const gameRef = ref(null)
-const awardRefs = ref({})
+const gameAimHeaderRef = ref<ComponentPublicInstance<GameAimHeaderExpose> | null>(null)
+const gameRef = ref<ComponentPublicInstance<GameBoardExpose> | null>(null)
+const awardRefs = ref<Record<number, ComponentPublicInstance | null>>({})
 
 const size = ref(defSize)
 const showSettings = ref(false)
@@ -195,15 +212,21 @@ const {highlightStart, onStart: dismissStartHint} = useStartGameHint(
 
 const awardsList = computed(() => Object.values(awards))
 
-function setAwardRef(el, aim) {
+function setAwardRef(el: ComponentPublicInstance | null, aim: number) {
   if (el) {
     awardRefs.value[aim] = el
   }
 }
 
-function getGameAimElement() {
+function bindAwardRef(aim: number) {
+  return (el: ComponentPublicInstance | null) => setAwardRef(el, aim)
+}
+
+function getGameAimElement(): HTMLElement | null {
   const exposed = gameAimHeaderRef.value?.gameAimEl
-  return exposed?.value ?? exposed ?? null
+  if (!exposed) return null
+  if (exposed instanceof HTMLElement) return exposed
+  return exposed.value ?? null
 }
 
 function openSettings() {
@@ -214,7 +237,7 @@ function closeSettings() {
   showSettings.value = false
 }
 
-function updateSavedSession(overrides = {}) {
+function updateSavedSession(overrides: Partial<GameSession> = {}) {
   if (!savedSession.value) return
 
   savedSession.value = {
@@ -227,7 +250,7 @@ function updateSavedSession(overrides = {}) {
   }
 }
 
-function onSessionUpdate({board, score: sessionScore}) {
+function onSessionUpdate({board, score: sessionScore}: { board: number[][]; score: number }) {
   savedSession.value = {
     size: size.value,
     score: sessionScore,
@@ -238,7 +261,7 @@ function onSessionUpdate({board, score: sessionScore}) {
   persistState()
 }
 
-function onSettingsSave({boardSize, colorTheme, locale, resetGame}) {
+function onSettingsSave({boardSize, colorTheme, locale, resetGame}: SettingsSavePayload) {
   if (resetGame) {
     gameStarted.value = false
     gameEnded.value = false
@@ -278,7 +301,7 @@ function onGameEnded() {
   flushPersistState()
 }
 
-function onGameScore(args) {
+function onGameScore(args: { score: number; scoreInc: number }) {
   let bestScoreUpdated = false
 
   if (features.scoreAnimation !== 'gsap') {
@@ -324,7 +347,7 @@ function onGameScore(args) {
   })
 }
 
-function onGameAimChanged(aim) {
+function onGameAimChanged(aim: number) {
   gameAim.value = aim
 }
 

@@ -1,9 +1,9 @@
-/** @typedef {'classic' | 'classic-dark' | 'ocean' | 'ocean-dark' | 'forest' | 'forest-dark' | 'sunset' | 'sunset-dark'} UiThemeId */
+import type {UiThemeId} from '../types/game'
+import type {ThemeLabelKey} from '../types/messages'
 
-export const DEFAULT_UI_THEME = 'classic'
+export const DEFAULT_UI_THEME: UiThemeId = 'classic'
 
-/** @type {readonly UiThemeId[]} */
-export const UI_THEME_IDS = [
+export const UI_THEME_IDS: readonly UiThemeId[] = [
     'classic',
     'classic-dark',
     'ocean',
@@ -14,8 +14,11 @@ export const UI_THEME_IDS = [
     'sunset-dark',
 ]
 
-/** @type {{ id: UiThemeId, labelKey: string, indicator: [string, string, string] }[]} */
-export const UI_THEMES = [
+export const UI_THEMES: Array<{
+    id: UiThemeId
+    labelKey: ThemeLabelKey
+    indicator: [string, string, string]
+}> = [
     {id: 'classic', labelKey: 'themeClassic', indicator: ['#bbada0', '#eee4da', '#edc22e']},
     {id: 'classic-dark', labelKey: 'themeClassicDark', indicator: ['#3c3a32', '#4a463f', '#edc22e']},
     {id: 'ocean', labelKey: 'themeOcean', indicator: ['#1565a8', '#bae6fd', '#fbbf24']},
@@ -26,17 +29,11 @@ export const UI_THEMES = [
     {id: 'sunset-dark', labelKey: 'themeSunsetDark', indicator: ['#4a2c35', '#5c3845', '#eab308']},
 ]
 
-/**
- * @param {string} themeId
- * @returns {UiThemeId}
- */
-export function normalizeUiThemeId(themeId) {
-    return UI_THEME_IDS.includes(themeId) ? themeId : DEFAULT_UI_THEME
+export function normalizeUiThemeId(themeId: string): UiThemeId {
+    const id = themeId as UiThemeId
+    return UI_THEME_IDS.includes(id) ? id : DEFAULT_UI_THEME
 }
 
-/**
- * @param {UiThemeId | string} themeId
- */
-export function applyUiTheme(themeId) {
+export function applyUiTheme(themeId: UiThemeId | string): void {
     document.documentElement.dataset.theme = normalizeUiThemeId(themeId)
 }

@@ -1,4 +1,6 @@
-export default {
+import type {MessageSchema} from '../types/messages'
+
+const en: MessageSchema = {
     sizeLabel: 'Size:',
     newGame: 'New Game',
     end: 'End',
@@ -27,3 +29,5 @@ export default {
     pwaUpdate: 'Update',
     pwaLater: 'Later',
 }
+
+export default en

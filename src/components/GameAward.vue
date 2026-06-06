@@ -8,13 +8,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {Icon} from '@iconify/vue'
-import {award as awardIocn} from '../icons.js'
+import {award as awardIocn} from '../icons'
+import type {GameAwardState} from '../types/game'
 
-defineProps({
-  award: {type: Object, required: true},
-})
+defineProps<{
+  award: GameAwardState
+}>()
 </script>
 
 <style scoped>

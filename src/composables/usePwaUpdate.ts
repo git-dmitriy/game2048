@@ -1,9 +1,6 @@
 import {ref, watch} from 'vue'
 import {useRegisterSW} from 'virtual:pwa-register/vue'
 
-/**
- * Service worker registration with a user-controlled update prompt.
- */
 export function usePwaUpdate() {
     const dismissed = ref(false)
 
@@ -21,11 +18,11 @@ export function usePwaUpdate() {
 
     const showPrompt = () => needRefresh.value && !dismissed.value
 
-    function dismiss() {
+    function dismiss(): void {
         dismissed.value = true
     }
 
-    async function applyUpdate() {
+    async function applyUpdate(): Promise<void> {
         await updateServiceWorker(true)
     }
 

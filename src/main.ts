@@ -10,10 +10,10 @@ import './themes/sunset.css'
 import './themes/sunset-dark.css'
 import './themes/chips.css'
 import './index.css'
-import {activePreset} from './config/activePreset.js'
-import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
-import {gamePresetKey, tileThemeKey} from './config/injectionKeys.js'
-import i18n from './i18n/index.js'
+import {activePreset} from './config/activePreset'
+import {applyUiTheme, normalizeUiThemeId} from './config/themes'
+import {gamePresetKey, tileThemeKey} from './config/injectionKeys'
+import i18n from './i18n'
 
 applyUiTheme(normalizeUiThemeId(activePreset.theme))
 

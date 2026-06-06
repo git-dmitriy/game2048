@@ -1,6 +1,7 @@
-import {ref, computed, watch, onUnmounted} from 'vue'
+import {ref, computed, watch, onUnmounted, type Ref} from 'vue'
+import type {GamePreset, LayoutRatios} from '../types/game'
 
-export const defaultLayoutRatios = {
+export const defaultLayoutRatios: LayoutRatios = {
     awardsHeight: 0.08,
     toolbarHeight: 0.16,
     gameOverSizeDivisor: 6,
@@ -12,10 +13,7 @@ export const defaultLayoutRatios = {
     awardWidthDivisor: 5,
 }
 
-/**
- * @param {import('../config/defaultPreset.js').defaultPreset} preset
- */
-export function getVerticalOverheadRatio(preset) {
+export function getVerticalOverheadRatio(preset: GamePreset): number {
     const ratios = {...defaultLayoutRatios, ...preset.layout?.ratios}
     const {features} = preset
     let overhead = 1 + ratios.toolbarHeight
@@ -28,11 +26,7 @@ export function getVerticalOverheadRatio(preset) {
     return overhead
 }
 
-/**
- * @param {import('../config/defaultPreset.js').defaultPreset} preset
- * @param {import('vue').Ref<HTMLElement | null>} [containerRef]
- */
-export function useBoardLayout(preset, containerRef) {
+export function useBoardLayout(preset: GamePreset, containerRef?: Ref<HTMLElement | null>) {
     const board = preset.board
     const ratios = {...defaultLayoutRatios, ...preset.layout?.ratios}
 
@@ -43,8 +37,8 @@ export function useBoardLayout(preset, containerRef) {
     const verticalOverhead = getVerticalOverheadRatio(preset)
 
     const boardSizePx = ref(0)
-    let resizeObserver = null
-    let resizeFallbackHandler = null
+    let resizeObserver: ResizeObserver | null = null
+    let resizeFallbackHandler: (() => void) | null = null
 
     const sizingVars = computed(() => ({
         '--board-min': minPx + 'px',
@@ -70,25 +64,23 @@ export function useBoardLayout(preset, containerRef) {
         }
     })
 
-    function syncBoardSizeFromElement(el) {
-        const w = el?.getBoundingClientRect().width
+    function syncBoardSizeFromElement(el: HTMLElement | null | undefined): void {
+        const w = el?.getBoundingClientRect().width ?? 0
         if (w > 0) {
             boardSizePx.value = Math.round(w)
         }
     }
 
-    function attachResizeFallback(el) {
+    function attachResizeFallback(el: HTMLElement): void {
         if (resizeFallbackHandler) return
 
         resizeFallbackHandler = () => syncBoardSizeFromElement(el)
         window.addEventListener('resize', resizeFallbackHandler)
     }
 
-    function observeContainer(el) {
+    function observeContainer(el: HTMLElement): void {
         resizeObserver?.disconnect()
         resizeObserver = null
-
-        if (!el) return
 
         syncBoardSizeFromElement(el)
 
@@ -98,7 +90,7 @@ export function useBoardLayout(preset, containerRef) {
         }
 
         resizeObserver = new ResizeObserver((entries) => {
-            const w = entries[0]?.contentRect?.width
+            const w = entries[0]?.contentRect?.width ?? 0
             if (w > 0) {
                 boardSizePx.value = Math.round(w)
             }
@@ -109,7 +101,9 @@ export function useBoardLayout(preset, containerRef) {
     if (containerRef) {
         watch(
             containerRef,
-            (el) => observeContainer(el),
+            (el) => {
+                if (el) observeContainer(el)
+            },
             {flush: 'post', immediate: true},
         )
     }

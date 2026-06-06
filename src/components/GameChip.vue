@@ -8,18 +8,22 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {computed, watch, nextTick, ref, onMounted} from 'vue'
-import {useTileTheme} from '../composables/useTileTheme.js'
+import {useTileTheme} from '../composables/useTileTheme'
+import type {BoardChip} from '../types/game'
 
 const tileTheme = useTileTheme()
 
-const props = defineProps({
-  chip: {type: Object, required: true},
-  sizePx: {type: Number, required: true},
-  animationTimeMs: {type: Number, default: 150},
-  moveDurationMs: {type: Number, default: undefined},
-  moveEasing: {type: String, default: 'ease-out'},
+const props = withDefaults(defineProps<{
+  chip: BoardChip
+  sizePx: number
+  animationTimeMs?: number
+  moveDurationMs?: number
+  moveEasing?: string
+}>(), {
+  animationTimeMs: 150,
+  moveEasing: 'ease-out',
 })
 
 const fontSizeStyle = computed(() => {
@@ -27,7 +31,7 @@ const fontSizeStyle = computed(() => {
   return {fontSize}
 })
 
-const chipEl = ref(null)
+const chipEl = ref<HTMLElement | null>(null)
 
 watch(() => props.chip.value, () => {
   nextTick(() => {
@@ -40,9 +44,10 @@ watch(() => props.chip.value, () => {
   })
 })
 
-function runMoveAnimation(el) {
+function runMoveAnimation(el: HTMLElement) {
   const moveMs = props.moveDurationMs ?? props.animationTimeMs
   const p = props.chip.prevRelPos
+  if (!p) return
   const startTransform = 'translate(' + p.left + 'px,' + p.top + 'px) translateZ(0)'
   const endTransform = 'translate(0, 0) translateZ(0)'
   const transitionValue =
@@ -55,7 +60,7 @@ function runMoveAnimation(el) {
   el.style.transform = endTransform
 }
 
-function runAppearAnimation(el) {
+function runAppearAnimation(el: HTMLElement) {
   el.style.animation = 'chip-appear ' + props.animationTimeMs + 'ms'
 }
 

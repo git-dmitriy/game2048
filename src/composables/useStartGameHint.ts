@@ -1,56 +1,54 @@
-import {ref, watch, onMounted, onUnmounted, nextTick} from 'vue'
+import {ref, watch, onMounted, onUnmounted, nextTick, type Ref} from 'vue'
 
 const IDLE_MS = 3500
-const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart']
+const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const
 
-/**
- * Подсказка «начать игру»: пульсация кнопки New Game после бездействия.
- * @param {boolean} enabled
- * @param {import('vue').Ref<boolean>} gameStarted
- * @param {import('vue').Ref<boolean>} paused — модалка настроек и т.п.
- */
-export function useStartGameHint(enabled, gameStarted, paused) {
+export function useStartGameHint(
+    enabled: boolean,
+    gameStarted: Ref<boolean>,
+    paused: Ref<boolean>,
+) {
     const highlightStart = ref(false)
-    let idleTimer = null
+    let idleTimer: ReturnType<typeof setTimeout> | null = null
 
-    function clearTimer() {
+    function clearTimer(): void {
         if (idleTimer) {
             clearTimeout(idleTimer)
             idleTimer = null
         }
     }
 
-    function dismiss() {
+    function dismiss(): void {
         highlightStart.value = false
     }
 
-    function canSchedule() {
+    function canSchedule(): boolean {
         return enabled && !gameStarted.value && !paused.value
     }
 
-    async function activateHint() {
+    async function activateHint(): Promise<void> {
         dismiss()
         await nextTick()
         highlightStart.value = true
     }
 
-    function schedule() {
+    function schedule(): void {
         clearTimer()
         dismiss()
         if (!canSchedule()) return
 
         idleTimer = setTimeout(() => {
             if (canSchedule()) {
-                activateHint()
+                void activateHint()
             }
         }, IDLE_MS)
     }
 
-    function onActivity() {
+    function onActivity(): void {
         schedule()
     }
 
-    function onStart() {
+    function onStart(): void {
         dismiss()
         clearTimer()
     }
