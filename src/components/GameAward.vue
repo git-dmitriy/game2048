@@ -3,14 +3,14 @@
       class="award"
       :class="{ 'award-obtained': award.obtained, 'award-not-obtained': !award.obtained }"
   >
-    <Icon :icon="thumbUpIcon" class="like" aria-hidden="true"/>
+    <Icon :icon="awardIocn" class="like" aria-hidden="true"/>
     {{ award.aim }}
   </div>
 </template>
 
 <script setup>
 import {Icon} from '@iconify/vue'
-import {thumbUpIcon} from '../icons.js'
+import {award as awardIocn} from '../icons.js'
 
 defineProps({
   award: {type: Object, required: true},

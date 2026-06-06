@@ -44,6 +44,7 @@ export const defaultPreset = {
     features: {
         awards: true,
         bestScorePerSize: true,
+        startGameHint: true,
         scoreAnimation: 'gsap',
         awardAnimation: 'fly',
     },

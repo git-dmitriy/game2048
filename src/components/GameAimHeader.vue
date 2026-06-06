@@ -16,7 +16,7 @@
           rel="noopener noreferrer"
           :aria-label="strings.website"
       >
-        <Icon :icon="webIcon" class="game-aim-link-icon" aria-hidden="true"/>
+        <Icon :icon="personIcon" class="game-aim-link-icon" aria-hidden="true"/>
       </a>
       <a
           class="game-aim-link"
@@ -35,7 +35,7 @@
 import {ref} from 'vue'
 import {Icon} from '@iconify/vue'
 import {useStrings} from '../composables/useStrings.js'
-import {webIcon, githubIcon} from '../icons.js'
+import {personIcon, githubIcon} from '../icons.js'
 
 const strings = useStrings()
 
@@ -75,7 +75,6 @@ defineExpose({gameAimEl})
 .game-aim-links {
   display: flex;
   align-items: center;
-  gap: 0.5em;
   padding: 0.35em 0.6em;
   font-size: calc(var(--game-aim-font-size) * 0.45);
 }

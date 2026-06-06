@@ -18,16 +18,17 @@
     <button
         type="button"
         class="toolbar-item toolbar-button toolbar-settings"
+        :aria-label="strings.settings"
         @click="$emit('open-settings')"
     >
       <Icon :icon="settingsIcon" class="icon-gear" aria-hidden="true"/>
-      <span class="button-label">{{ strings.settings }}</span>
     </button>
 
     <button
         v-if="!gameStarted"
         type="button"
         class="toolbar-item toolbar-button toolbar-primary"
+        :class="{ 'toolbar-primary--hint': highlightStart }"
         @click="$emit('start')"
     >
       {{ strings.newGame }}
@@ -55,6 +56,7 @@ defineProps({
   scoreInc: {type: String, default: ''},
   bestScore: {type: Number, required: true},
   gameStarted: {type: Boolean, required: true},
+  highlightStart: {type: Boolean, default: false},
 })
 
 defineEmits(['open-settings', 'start', 'end'])
@@ -122,8 +124,9 @@ defineEmits(['open-settings', 'start', 'end'])
 }
 
 .toolbar-settings {
-  background-color: var(--color-panel);
-  color: var(--color-text);
+  font-size: 1.4rem;
+  background-color: var(--color-board);
+  color: var(--color-on-dark);
 }
 
 .toolbar-primary {
@@ -131,15 +134,34 @@ defineEmits(['open-settings', 'start', 'end'])
   color: var(--color-on-dark);
 }
 
-.icon-gear {
-  width: 1.2em;
-  height: 1.2em;
-  flex-shrink: 0;
+.toolbar-primary--hint {
+  animation: start-hint-pulse 1.2s ease-in-out 4;
 }
 
-.button-label {
-  font-size: calc(var(--button-font-size) * 0.7);
-  line-height: 1.1;
+@keyframes start-hint-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolbar-primary--hint {
+    animation: none;
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+.icon-gear {
+  width: 1.35em;
+  height: 1.35em;
+  flex-shrink: 0;
 }
 
 @keyframes up-disappear {

@@ -26,6 +26,7 @@
           :score-inc="scoreInc"
           :best-score="bestScore[size]"
           :game-started="gameStarted"
+          :highlight-start="highlightStart"
           @open-settings="openSettings"
           @start="startGame"
           @end="gameStarted = false"
@@ -36,6 +37,7 @@
             :score-inc="scoreInc"
             :best-score="bestScore[size]"
             :game-started="gameStarted"
+            :highlight-start="highlightStart"
             @open-settings="openSettings"
             @start="startGame"
             @end="gameStarted = false"
@@ -124,6 +126,7 @@ import {useBoardLayout} from './composables/useBoardLayout.js'
 import {useAppComponents} from './composables/useAppComponents.js'
 import {useAwardAnimation} from './composables/useAwardAnimation.js'
 import {useGamePersistence} from './composables/useGamePersistence.js'
+import {useStartGameHint} from './composables/useStartGameHint.js'
 import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
 import AppSettings from './components/AppSettings.vue'
@@ -168,6 +171,13 @@ const score = ref(0)
 const scoreInc = ref('')
 const isVisible = ref(false)
 
+const startGameHintEnabled = features.startGameHint !== false
+const {highlightStart, onStart: dismissStartHint} = useStartGameHint(
+    startGameHintEnabled,
+    gameStarted,
+    showSettings,
+)
+
 const awardsList = computed(() => Object.values(awards))
 
 function setAwardRef(el, aim) {
@@ -207,6 +217,7 @@ function onSettingsSave({boardSize, colorTheme, resetGame}) {
 }
 
 function startGame() {
+  dismissStartHint()
   gameStarted.value = true
   score.value = 0
 }
