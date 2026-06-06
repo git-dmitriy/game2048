@@ -60,7 +60,7 @@ const props = defineProps({
   started: {type: Boolean, default: false}
 })
 
-const emit = defineEmits(['started', 'ended', 'score', 'aim-changed', 'aim-reached'])
+const emit = defineEmits(['started', 'ended', 'score', 'aim-changed', 'aim-reached', 'session-update'])
 
 const boardEl = ref(null)
 const cellRefs = ref([])
@@ -117,6 +117,9 @@ const cellSizePx = computed(() => {
 
 let keydownCleanup = null
 let swipeDetach = null
+/** @type {ReturnType<typeof createGame2048FromPreset> | null} */
+let game = null
+let skipAutostart = false
 
 watch(() => props.boardSizePx, (px) => {
   if (px > 0) {
@@ -132,8 +135,12 @@ watch(() => props.size, () => {
 
 watch(() => props.started, (nv, ov) => {
   if (nv) {
+    if (skipAutostart) {
+      skipAutostart = false
+      return
+    }
     startGame()
-  } else {
+  } else if (ov) {
     endGame()
   }
 })
@@ -187,6 +194,22 @@ function addChip(c) {
 
 function addChips(chips) {
   chips.forEach(addChip)
+}
+
+function populateChipsFromBoard(board) {
+  for (let y = 0; y < props.size; y++) {
+    for (let x = 0; x < props.size; x++) {
+      const value = board[y][x]
+      if (value > 0) {
+        addChip({x, y, value})
+      }
+    }
+  }
+}
+
+function emitSessionUpdate() {
+  if (!game) return
+  emit('session-update', game.getSnapshot())
 }
 
 function moveChip(from, to) {
@@ -258,6 +281,7 @@ function createGameMove(game) {
       moveCooldownUntil = Date.now() + moveDuration
     }
     consolidateAndAddChipsDeferred.renew()
+    emitSessionUpdate()
     if (!game.canMove()) {
       setTimeout(() => {
         endGame()
@@ -266,14 +290,50 @@ function createGameMove(game) {
   }
 }
 
-function startGame() {
-  emptyCells()
-  const game = createGame2048FromPreset(preset, props.size)
-  addChips(game.spawnTiles(getInitialSpawns(preset, props.size)))
-  const doGameMove = createGameMove(game)
+function attachControls(doGameMove) {
   runKeyboardControl(doGameMove)
   runTouchControl(doGameMove)
+}
+
+function startGame() {
+  emptyCells()
+  chipIdCounter = 0
+  moveKeyCounter = 0
+  game = createGame2048FromPreset(preset, props.size)
+  addChips(game.spawnTiles(getInitialSpawns(preset, props.size)))
+  attachControls(createGameMove(game))
+  emitSessionUpdate()
   emit('started')
+}
+
+/**
+ * @param {{ board: number[][], score: number }} session
+ * @param {{ interactive?: boolean }} [options]
+ */
+function restoreSession(session, options = {}) {
+  const interactive = options.interactive !== false
+
+  endGame()
+  emptyCells()
+  chipIdCounter = 0
+  moveKeyCounter = 0
+  game = createGame2048FromPreset(preset, props.size)
+
+  if (!game.loadSnapshot(session.board, session.score)) {
+    game = null
+    return false
+  }
+
+  populateChipsFromBoard(session.board)
+
+  if (interactive) {
+    skipAutostart = true
+    attachControls(createGameMove(game))
+    emit('started')
+  }
+
+  emitSessionUpdate()
+  return true
 }
 
 function endGame() {
@@ -285,8 +345,13 @@ function endGame() {
     swipeDetach()
     swipeDetach = null
   }
+  emitSessionUpdate()
   emit('ended')
 }
+
+defineExpose({
+  restoreSession,
+})
 
 onMounted(() => {
   boardSizeAutoPx.value =

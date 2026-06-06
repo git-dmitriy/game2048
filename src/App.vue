@@ -73,6 +73,7 @@
               @score="onGameScore"
               @aim-changed="onGameAimChanged"
               @aim-reached="onGameAimReached"
+              @session-update="onSessionUpdate"
           />
         </slot>
       </div>
@@ -134,6 +135,7 @@ import {useStartGameHint} from './composables/useStartGameHint.js'
 import {getBoardSizes, getWinTile} from './config/defaultPreset.js'
 import {applyUiTheme, normalizeUiThemeId} from './config/themes.js'
 import {detectLocale, setAppLocale} from './i18n/index.js'
+import {isValidGameSession} from './lib/gameSession.js'
 import AppSettings from './components/AppSettings.vue'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt.vue'
 
@@ -162,7 +164,13 @@ const appSettings = reactive({
   locale: detectLocale(),
 })
 
-const {loadState, persistState} = useGamePersistence(preset, {awards, bestScore, settings: appSettings})
+const savedSession = ref(null)
+const {loadState, persistState, flushPersistState, clearSession} = useGamePersistence(preset, {
+  awards,
+  bestScore,
+  settings: appSettings,
+  session: savedSession,
+})
 
 const gameAimHeaderRef = ref(null)
 const gameRef = ref(null)
@@ -206,12 +214,37 @@ function closeSettings() {
   showSettings.value = false
 }
 
+function updateSavedSession(overrides = {}) {
+  if (!savedSession.value) return
+
+  savedSession.value = {
+    ...savedSession.value,
+    size: size.value,
+    score: score.value,
+    gameEnded: gameEnded.value,
+    gameAimReached: gameAimReached.value,
+    ...overrides,
+  }
+}
+
+function onSessionUpdate({board, score: sessionScore}) {
+  savedSession.value = {
+    size: size.value,
+    score: sessionScore,
+    board,
+    gameEnded: gameEnded.value,
+    gameAimReached: gameAimReached.value,
+  }
+  persistState()
+}
+
 function onSettingsSave({boardSize, colorTheme, locale, resetGame}) {
   if (resetGame) {
     gameStarted.value = false
     gameEnded.value = false
     gameAimReached.value = false
     score.value = 0
+    clearSession()
   }
 
   size.value = boardSize
@@ -221,11 +254,14 @@ function onSettingsSave({boardSize, colorTheme, locale, resetGame}) {
   applyUiTheme(colorTheme)
   gameAim.value = getWinTile(preset, boardSize)
   showSettings.value = false
-  persistState()
+  flushPersistState()
 }
 
 function startGame() {
   dismissStartHint()
+  clearSession()
+  gameEnded.value = false
+  gameAimReached.value = false
   gameStarted.value = true
   score.value = 0
 }
@@ -238,8 +274,8 @@ function onGameStarted() {
 function onGameEnded() {
   gameStarted.value = false
   gameEnded.value = true
-  gameAimReached.value = false
-  persistState()
+  updateSavedSession({gameEnded: true})
+  flushPersistState()
 }
 
 function onGameScore(args) {
@@ -255,7 +291,7 @@ function onGameScore(args) {
     nextTick(() => {
       scoreInc.value = ''
     })
-    if (bestScoreUpdated) persistState()
+    if (bestScoreUpdated) flushPersistState()
     return
   }
 
@@ -278,7 +314,7 @@ function onGameScore(args) {
       onUpdate: () => {
         bestScore[size.value] = Math.floor(bs.score)
       },
-      onComplete: () => persistState(),
+      onComplete: () => flushPersistState(),
     })
   }
 
@@ -297,7 +333,8 @@ function onGameAimReached() {
   if (features.awards && awards[gameAim.value]) {
     awards[gameAim.value].obtained = true
   }
-  persistState()
+  updateSavedSession({gameAimReached: true})
+  flushPersistState()
 
   if (!features.awards) return
 
@@ -311,7 +348,30 @@ watch(size, () => {
   gameEnded.value = false
 })
 
-onMounted(() => {
+async function restoreSavedSession() {
+  const session = savedSession.value
+  if (!session || !isValidGameSession(session, size.value)) {
+    if (session) clearSession()
+    return
+  }
+
+  score.value = session.score
+  gameEnded.value = session.gameEnded
+  gameAimReached.value = session.gameAimReached
+
+  await nextTick()
+
+  const restored = gameRef.value?.restoreSession(
+      {board: session.board, score: session.score},
+      {interactive: !session.gameEnded},
+  )
+
+  if (!restored) {
+    clearSession()
+  }
+}
+
+onMounted(async () => {
   loadState()
   const savedSize = sizes.includes(appSettings.size) ? appSettings.size : defSize
   size.value = savedSize
@@ -319,6 +379,7 @@ onMounted(() => {
   appSettings.locale = setAppLocale(appSettings.locale)
   gameAim.value = getWinTile(preset, savedSize)
   applyUiTheme(appSettings.theme)
+  await restoreSavedSession()
   requestAnimationFrame(() => {
     isVisible.value = true
   })

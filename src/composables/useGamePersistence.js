@@ -1,13 +1,20 @@
+import {isRef, unref, onMounted, onBeforeUnmount} from 'vue'
 import {normalizeUiThemeId} from '../config/themes.js'
 import {normalizeLocale} from '../i18n/index.js'
 
 const DEFAULT_STORAGE_KEY = 'game2048-state'
+const PERSIST_DEBOUNCE_MS = 400
+
+/**
+ * @typedef {import('../lib/gameSession.js').GameSession} GameSession
+ */
 
 /**
  * @typedef {object} GamePersistedState
  * @property {Record<string, number>} [bestScore]
  * @property {Record<string, { aim: number, obtained: boolean }>} [awards]
  * @property {{ size?: number, theme?: string, locale?: string }} [settings]
+ * @property {GameSession | null} [session]
  */
 
 /**
@@ -59,9 +66,18 @@ export function saveGameState(preset, state) {
 /**
  * Загрузка / сохранение bestScore, awards и настроек в localStorage.
  * @param {object} preset
- * @param {{ awards: object, bestScore: object, settings?: { size?: number, theme?: string, locale?: string } }} stores
+ * @param {{
+ *   awards: object,
+ *   bestScore: object,
+ *   settings?: { size?: number, theme?: string, locale?: string },
+ *   session?: GameSession | null,
+ * }} stores
  */
 export function useGamePersistence(preset, stores) {
+    /** @type {ReturnType<typeof setTimeout> | null} */
+    let persistTimer = null
+    let dirty = false
+
     function buildState() {
         /** @type {GamePersistedState} */
         const state = {
@@ -75,6 +91,10 @@ export function useGamePersistence(preset, stores) {
                 theme: stores.settings.theme,
                 locale: stores.settings.locale,
             }
+        }
+
+        if (stores.session !== undefined) {
+            state.session = unref(stores.session) ?? null
         }
 
         return state
@@ -98,11 +118,76 @@ export function useGamePersistence(preset, stores) {
                 stores.settings.locale = normalizeLocale(state.settings.locale)
             }
         }
+
+        if (stores.session !== undefined) {
+            const sessionValue = state.session ?? null
+            if (isRef(stores.session)) {
+                stores.session.value = sessionValue
+            } else {
+                stores.session = sessionValue
+            }
+        }
+    }
+
+    function flushPersistState() {
+        if (persistTimer) {
+            clearTimeout(persistTimer)
+            persistTimer = null
+        }
+
+        if (!isPersistenceEnabled(preset)) {
+            dirty = false
+            return
+        }
+
+        saveGameState(preset, buildState())
+        dirty = false
     }
 
     function persistState() {
-        saveGameState(preset, buildState())
+        if (!isPersistenceEnabled(preset)) return
+
+        dirty = true
+        if (persistTimer) clearTimeout(persistTimer)
+        persistTimer = setTimeout(flushPersistState, PERSIST_DEBOUNCE_MS)
     }
 
-    return {loadState, persistState}
+    function flushOnExit() {
+        if (!dirty) return
+        flushPersistState()
+    }
+
+    function clearSession() {
+        if (stores.session === undefined) return
+        if (isRef(stores.session)) {
+            stores.session.value = null
+        } else {
+            stores.session = null
+        }
+        dirty = true
+        flushPersistState()
+    }
+
+    onMounted(() => {
+        window.addEventListener('pagehide', flushOnExit)
+        document.addEventListener('visibilitychange', onVisibilityChange)
+    })
+
+    onBeforeUnmount(() => {
+        flushOnExit()
+        window.removeEventListener('pagehide', flushOnExit)
+        document.removeEventListener('visibilitychange', onVisibilityChange)
+        if (persistTimer) {
+            clearTimeout(persistTimer)
+            persistTimer = null
+        }
+    })
+
+    function onVisibilityChange() {
+        if (document.visibilityState === 'hidden') {
+            flushOnExit()
+        }
+    }
+
+    return {loadState, persistState, flushPersistState, clearSession}
 }
