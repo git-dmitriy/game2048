@@ -28,6 +28,11 @@ export interface MessageSchema {
     pwaUpdateAvailable: string
     pwaUpdate: string
     pwaLater: string
+    pwaInstallTitle: string
+    pwaInstallStep1: string
+    pwaInstallStep2: string
+    pwaInstallStep3: string
+    pwaInstallGotIt: string
 }
 
 export type ThemeLabelKey =

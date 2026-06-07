@@ -28,6 +28,11 @@ const es: MessageSchema = {
     pwaUpdateAvailable: 'Hay una nueva versión disponible.',
     pwaUpdate: 'Actualizar',
     pwaLater: 'Más tarde',
+    pwaInstallTitle: 'Instalar la app',
+    pwaInstallStep1: 'Toca Compartir en Safari.',
+    pwaInstallStep2: 'Elige "Añadir a inicio".',
+    pwaInstallStep3: 'Toca "Añadir" para confirmar.',
+    pwaInstallGotIt: 'Entendido',
 }
 
 export default es

@@ -28,6 +28,11 @@ const ru: MessageSchema = {
     pwaUpdateAvailable: 'Доступна новая версия.',
     pwaUpdate: 'Обновить',
     pwaLater: 'Позже',
+    pwaInstallTitle: 'Установите приложение',
+    pwaInstallStep1: 'Нажмите «Поделиться» в Safari.',
+    pwaInstallStep2: 'Выберите «На экран Домой».',
+    pwaInstallStep3: 'Нажмите «Добавить».',
+    pwaInstallGotIt: 'Понятно',
 }
 
 export default ru

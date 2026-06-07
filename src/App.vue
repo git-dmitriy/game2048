@@ -126,6 +126,7 @@
     </slot>
 
     <PwaUpdatePrompt/>
+    <PwaInstallPrompt/>
   </div>
 </template>
 
@@ -135,6 +136,7 @@ import {useGameController} from './composables/useGameController'
 import AppSettings from './components/AppSettings.vue'
 import AppCopyright from './components/AppCopyright.vue'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt.vue'
+import PwaInstallPrompt from './components/PwaInstallPrompt.vue'
 
 const gameContainerEl = ref<HTMLElement | null>(null)
 

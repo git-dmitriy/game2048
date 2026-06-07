@@ -7,7 +7,15 @@ export default defineConfig({
         vue(),
         VitePWA({
             registerType: 'prompt',
-            includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+            includeAssets: [
+                'favicon.ico',
+                'apple-touch-icon.png',
+                'icon.svg',
+                'icon-maskable.svg',
+                'pwa-maskable-512x512.png',
+                'screenshots/mobile.png',
+                'screenshots/wide.png',
+            ],
             manifest: {
                 name: '2048',
                 short_name: '2048',
@@ -30,10 +38,24 @@ export default defineConfig({
                         type: 'image/png',
                     },
                     {
-                        src: 'pwa-512x512.png',
+                        src: 'pwa-maskable-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'maskable',
+                    },
+                ],
+                screenshots: [
+                    {
+                        src: 'screenshots/mobile.png',
+                        sizes: '764x1358',
+                        type: 'image/png',
+                        form_factor: 'narrow',
+                    },
+                    {
+                        src: 'screenshots/wide.png',
+                        sizes: '2560x1440',
+                        type: 'image/png',
+                        form_factor: 'wide',
                     },
                 ],
             },
@@ -43,7 +65,7 @@ export default defineConfig({
                 cleanupOutdatedCaches: true,
             },
             devOptions: {
-                enabled: false,
+                enabled: true,
             },
         }),
     ],
