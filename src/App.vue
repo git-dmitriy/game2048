@@ -96,6 +96,12 @@
       </div>
     </slot>
 
+    <div class="layout-row layout-row-copyright">
+      <slot name="copyright">
+        <AppCopyright/>
+      </slot>
+    </div>
+
     <slot
         name="settings"
         :visible="showSettings"
@@ -127,6 +133,7 @@
 import {ref} from 'vue'
 import {useGameController} from './composables/useGameController'
 import AppSettings from './components/AppSettings.vue'
+import AppCopyright from './components/AppCopyright.vue'
 import PwaUpdatePrompt from './components/PwaUpdatePrompt.vue'
 
 const gameContainerEl = ref<HTMLElement | null>(null)
@@ -215,6 +222,10 @@ const {
   justify-content: space-around;
   align-items: center;
   height: var(--awards-height);
+}
+
+.layout-row-copyright {
+  min-height: 1.25em;
 }
 
 .appearing {

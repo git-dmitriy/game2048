@@ -1,6 +1,7 @@
 {
   "name": "game2048",
   "private": true,
+  "license": "MIT",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -20,8 +21,8 @@
     "@iconify-icons/simple-icons": "^1.2.74",
     "@vitejs/plugin-vue": "^5.0.0",
     "typescript": "^6.0.3",
-    "vue-tsc": "^2.2.10",
     "vite": "^5.0.0",
-    "vite-plugin-pwa": "^1.3.0"
+    "vite-plugin-pwa": "^1.3.0",
+    "vue-tsc": "^2.2.10"
   }
 }
