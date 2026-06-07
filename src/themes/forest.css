@@ -1,0 +1,68 @@
+/**
+ * Forest — природная зелёная палитра.
+ */
+[data-theme='forest'] {
+    --color-bg: #f0f7f0;
+    --color-board: #2d5a3d;
+    --color-cell: #4a7c59;
+    --color-panel: #6b9b7a;
+    --color-overlay: rgba(240, 247, 240, 0.78);
+
+    --color-text: #1a3d2a;
+    --color-on-dark: #f0fdf4;
+    --color-score-inc: #1a3d2a;
+    --color-score-label: #dcfce7;
+
+    --color-accent: #16a34a;
+    --color-control-border: #2d5a3d;
+
+    --color-shadow: rgba(26, 61, 42, 0.2);
+    --color-aim-reached-glow: #86efac;
+
+    --color-chip-fallback: #dcfce7;
+    --color-tile-shadow: 0 2px 4px 0 rgba(26, 61, 42, 0.12);
+    --color-tile-shadow-glow: 0 0 16px 3px #86efac;
+
+    --color-tile-2: #ecfdf5;
+    --color-tile-2-text: #1a3d2a;
+    --color-tile-4: #d1fae5;
+    --color-tile-4-text: #1a3d2a;
+    --color-tile-8: #a7f3d0;
+    --color-tile-8-text: #1a3d2a;
+    --color-tile-16: #6ee7b7;
+    --color-tile-16-text: #1a3d2a;
+    --color-tile-32: #34d399;
+    --color-tile-32-text: #f0fdf4;
+    --color-tile-64: #10b981;
+    --color-tile-64-text: #f0fdf4;
+    --color-tile-128: #059669;
+    --color-tile-128-text: #f0fdf4;
+    --color-tile-256: #047857;
+    --color-tile-256-text: #f0fdf4;
+    --color-tile-512: #65a30d;
+    --color-tile-512-text: #f0fdf4;
+    --color-tile-1024: #ca8a04;
+    --color-tile-1024-text: #f0fdf4;
+    --color-tile-2048: #eab308;
+    --color-tile-2048-text: #1a3d2a;
+    --color-tile-4096: #ca8a04;
+    --color-tile-4096-text: #f0fdf4;
+    --color-tile-8192: #a16207;
+    --color-tile-8192-text: #f0fdf4;
+    --color-tile-16384: #854d0e;
+    --color-tile-16384-text: #f0fdf4;
+    --color-tile-32768: #713f12;
+    --color-tile-32768-text: #f0fdf4;
+    --color-tile-65536: #5c3310;
+    --color-tile-65536-text: #f0fdf4;
+    --color-tile-default: #166534;
+    --color-tile-default-text: #f0fdf4;
+
+    --color-award-muted: #dcfce7;
+    --color-award-inactive-bg: #6b9b7a;
+    --color-award-gold: #eab308;
+    --color-award-yellow: #fde047;
+    --color-award-orange: #34d399;
+
+    --font-family: 'Source Sans Pro', Arial, sans-serif;
+}

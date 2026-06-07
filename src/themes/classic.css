@@ -1,0 +1,75 @@
+/**
+ * Классическая палитра оригинальной игры 2048 (Gabriele Cirulli).
+ */
+:root,
+[data-theme='classic'] {
+    /* Поверхности */
+    --color-bg: #faf8ef;
+    --color-board: #bbada0;
+    --color-cell: #cdc1b4;
+    --color-panel: #bbada0;
+    --color-overlay: rgba(238, 228, 218, 0.73);
+
+    /* Текст */
+    --color-text: #776e65;
+    --color-on-dark: #f9f6f2;
+    --color-score-inc: #776e65;
+    --color-score-label: #eee4da;
+
+    /* Интерактив */
+    --color-accent: #8f7a66;
+    --color-control-border: #bbada0;
+
+    /* Эффекты */
+    --color-shadow: rgba(0, 0, 0, 0.2);
+    --color-aim-reached-glow: #f9f6f2;
+
+    /* Плитки — общее */
+    --color-chip-fallback: #eee4da;
+    --color-tile-shadow: none;
+    --color-tile-shadow-glow: none;
+
+    --color-tile-2: #eee4da;
+    --color-tile-2-text: #776e65;
+    --color-tile-4: #ede0c8;
+    --color-tile-4-text: #776e65;
+    --color-tile-8: #f2b179;
+    --color-tile-8-text: #f9f6f2;
+    --color-tile-16: #f59563;
+    --color-tile-16-text: #f9f6f2;
+    --color-tile-32: #f67c5f;
+    --color-tile-32-text: #f9f6f2;
+    --color-tile-64: #f65e3b;
+    --color-tile-64-text: #f9f6f2;
+    --color-tile-128: #edcf72;
+    --color-tile-128-text: #f9f6f2;
+    --color-tile-256: #edcc61;
+    --color-tile-256-text: #f9f6f2;
+    --color-tile-512: #edc850;
+    --color-tile-512-text: #f9f6f2;
+    --color-tile-1024: #edc53f;
+    --color-tile-1024-text: #f9f6f2;
+    --color-tile-2048: #edc22e;
+    --color-tile-2048-text: #f9f6f2;
+    --color-tile-4096: #ddb520;
+    --color-tile-4096-text: #f9f6f2;
+    --color-tile-8192: #cda818;
+    --color-tile-8192-text: #f9f6f2;
+    --color-tile-16384: #bd9b10;
+    --color-tile-16384-text: #f9f6f2;
+    --color-tile-32768: #ad8e0a;
+    --color-tile-32768-text: #f9f6f2;
+    --color-tile-65536: #9d8106;
+    --color-tile-65536-text: #f9f6f2;
+    --color-tile-default: #3c3a32;
+    --color-tile-default-text: #f9f6f2;
+
+    /* Награды */
+    --color-award-muted: var(--color-on-dark);
+    --color-award-inactive-bg: #bbada0;
+    --color-award-gold: #edc22e;
+    --color-award-yellow: #edc850;
+    --color-award-orange: #f59563;
+
+    --font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+}

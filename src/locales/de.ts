@@ -1,0 +1,38 @@
+import type {MessageSchema} from '../types/messages'
+
+const de: MessageSchema = {
+    sizeLabel: 'Größe:',
+    newGame: 'Neues Spiel',
+    end: 'Stopp',
+    settings: 'Einstellungen',
+    boardSize: 'Spielfeldgröße',
+    colorScheme: 'Farbschema',
+    language: 'Sprache',
+    save: 'Speichern',
+    confirm: 'Bestätigen',
+    cancel: 'Abbrechen',
+    settingsResetWarning: 'Die Änderung der Spielfeldgröße setzt das aktuelle Spiel zurück.',
+    themeClassic: 'Klassisch',
+    themeClassicDark: 'Klassisch dunkel',
+    themeOcean: 'Ozean',
+    themeOceanDark: 'Ozean dunkel',
+    themeForest: 'Wald',
+    themeForestDark: 'Wald dunkel',
+    themeSunset: 'Sonnenuntergang',
+    themeSunsetDark: 'Sonnenuntergang dunkel',
+    gameOver: 'Spiel vorbei!',
+    score: 'Punkte',
+    best: 'Rekord',
+    website: 'Portfolio-Website',
+    githubProfile: 'GitHub-Profil',
+    pwaUpdateAvailable: 'Eine neue Version ist verfügbar.',
+    pwaUpdate: 'Aktualisieren',
+    pwaLater: 'Später',
+    pwaInstallTitle: 'App installieren',
+    pwaInstallStep1: 'Tippen Sie in Safari auf „Teilen“.',
+    pwaInstallStep2: 'Wählen Sie „Zum Home-Bildschirm“.',
+    pwaInstallStep3: 'Tippen Sie auf „Hinzufügen“.',
+    pwaInstallGotIt: 'Verstanden',
+}
+
+export default de

@@ -1,16 +1,21 @@
 <template>
   <div v-if="visible" class="overlay-wrapper">
-    <div class="overlay half-white appearing07"></div>
-    <div class="overlay game-over appearing" :style="gameOverStyle">
-      <p>Game over!</p>
+    <div class="overlay half-white appearing-backdrop"></div>
+    <div class="overlay game-over appearing">
+      <p>{{ t('gameOver') }}</p>
     </div>
   </div>
 </template>
 
-<script setup>
-defineProps({
-  visible: { type: Boolean, default: false },
-  gameOverStyle: { type: Object, default: () => ({}) }
+<script setup lang="ts">
+import {useI18n} from 'vue-i18n'
+
+const {t} = useI18n()
+
+withDefaults(defineProps<{
+  visible?: boolean
+}>(), {
+  visible: false,
 })
 </script>
 
@@ -35,30 +40,21 @@ defineProps({
 }
 
 .half-white {
-  background-color: white;
-  opacity: 0.7;
+  background-color: var(--color-overlay);
 }
 
 .game-over {
   font-weight: bold;
   text-align: center;
+  font-size: var(--game-over-font-size);
+  color: var(--color-text);
 }
 
 .appearing {
-  animation: appearing 1s;
+  animation: appearing var(--motion-slow) var(--motion-ease);
 }
 
-.appearing07 {
-  animation: appearing07 1s;
-}
-
-@keyframes appearing {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes appearing07 {
-  0% { opacity: 0; }
-  100% { opacity: 0.7; }
+.appearing-backdrop {
+  animation: appearing-backdrop var(--motion-slow) var(--motion-ease);
 }
 </style>

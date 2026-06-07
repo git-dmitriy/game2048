@@ -1,0 +1,5 @@
+export {default as settingsIcon} from '@iconify-icons/mdi/cog'
+export {default as closeIcon} from '@iconify-icons/mdi/close'
+export {default as award} from '@iconify-icons/mdi/award'
+export {default as personIcon} from '@iconify-icons/mdi/person-circle'
+export {default as githubIcon} from '@iconify-icons/mdi/github'

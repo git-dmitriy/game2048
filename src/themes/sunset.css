@@ -1,0 +1,68 @@
+/**
+ * Sunset — тёплая закатная палитра.
+ */
+[data-theme='sunset'] {
+    --color-bg: #fff5f0;
+    --color-board: #9c4a6a;
+    --color-cell: #c45d7a;
+    --color-panel: #d4849a;
+    --color-overlay: rgba(255, 245, 240, 0.78);
+
+    --color-text: #5c2a3a;
+    --color-on-dark: #fff7ed;
+    --color-score-inc: #5c2a3a;
+    --color-score-label: #ffedd5;
+
+    --color-accent: #ea580c;
+    --color-control-border: #9c4a6a;
+
+    --color-shadow: rgba(92, 42, 58, 0.2);
+    --color-aim-reached-glow: #fdba74;
+
+    --color-chip-fallback: #ffedd5;
+    --color-tile-shadow: 0 2px 4px 0 rgba(92, 42, 58, 0.12);
+    --color-tile-shadow-glow: 0 0 16px 3px #fb923c;
+
+    --color-tile-2: #fff1f2;
+    --color-tile-2-text: #5c2a3a;
+    --color-tile-4: #ffe4e6;
+    --color-tile-4-text: #5c2a3a;
+    --color-tile-8: #fecdd3;
+    --color-tile-8-text: #5c2a3a;
+    --color-tile-16: #fda4af;
+    --color-tile-16-text: #5c2a3a;
+    --color-tile-32: #fb7185;
+    --color-tile-32-text: #fff7ed;
+    --color-tile-64: #f43f5e;
+    --color-tile-64-text: #fff7ed;
+    --color-tile-128: #e11d48;
+    --color-tile-128-text: #fff7ed;
+    --color-tile-256: #c2410c;
+    --color-tile-256-text: #fff7ed;
+    --color-tile-512: #ea580c;
+    --color-tile-512-text: #fff7ed;
+    --color-tile-1024: #d97706;
+    --color-tile-1024-text: #fff7ed;
+    --color-tile-2048: #eab308;
+    --color-tile-2048-text: #5c2a3a;
+    --color-tile-4096: #d97706;
+    --color-tile-4096-text: #fff7ed;
+    --color-tile-8192: #b45309;
+    --color-tile-8192-text: #fff7ed;
+    --color-tile-16384: #92400e;
+    --color-tile-16384-text: #fff7ed;
+    --color-tile-32768: #78350f;
+    --color-tile-32768-text: #fff7ed;
+    --color-tile-65536: #5c2a0a;
+    --color-tile-65536-text: #fff7ed;
+    --color-tile-default: #9f1239;
+    --color-tile-default-text: #fff7ed;
+
+    --color-award-muted: #ffedd5;
+    --color-award-inactive-bg: #d4849a;
+    --color-award-gold: #eab308;
+    --color-award-yellow: #fde047;
+    --color-award-orange: #fb923c;
+
+    --font-family: 'Source Sans Pro', Arial, sans-serif;
+}

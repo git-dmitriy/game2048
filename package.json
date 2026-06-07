@@ -1,19 +1,31 @@
 {
   "name": "game2048",
   "private": true,
+  "license": "MIT",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "generate:pwa-assets": "node scripts/generate-pwa-assets.mjs",
+    "prebuild": "npm run generate:pwa-assets"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.1",
+    "gsap": "^3.12.0",
     "vue": "^3.4.0",
-    "gsap": "^3.12.0"
+    "vue-i18n": "^11.4.5"
   },
   "devDependencies": {
+    "@iconify-icons/mdi": "^1.2.48",
+    "@iconify-icons/simple-icons": "^1.2.74",
     "@vitejs/plugin-vue": "^5.0.0",
-    "vite": "^5.0.0"
+    "sharp": "^0.34.2",
+    "typescript": "^6.0.3",
+    "vite": "^5.0.0",
+    "vite-plugin-pwa": "^1.3.0",
+    "vue-tsc": "^2.2.10"
   }
 }

@@ -1,0 +1,68 @@
+/**
+ * Ocean dark — морская палитра в тёмном режиме.
+ */
+[data-theme='ocean-dark'] {
+    --color-bg: #0c1929;
+    --color-board: #1a3d5c;
+    --color-cell: #234e70;
+    --color-panel: #1a3d5c;
+    --color-overlay: rgba(12, 25, 41, 0.88);
+
+    --color-text: #e0f2fe;
+    --color-on-dark: #f0f9ff;
+    --color-score-inc: #e0f2fe;
+    --color-score-label: #bae6fd;
+
+    --color-accent: #0ea5e9;
+    --color-control-border: #234e70;
+
+    --color-shadow: rgba(0, 0, 0, 0.45);
+    --color-aim-reached-glow: #7dd3fc;
+
+    --color-chip-fallback: #234e70;
+    --color-tile-shadow: none;
+    --color-tile-shadow-glow: 0 0 14px 2px #0ea5e9;
+
+    --color-tile-2: #234e70;
+    --color-tile-2-text: #bae6fd;
+    --color-tile-4: #2a5f85;
+    --color-tile-4-text: #bae6fd;
+    --color-tile-8: #1d6a9a;
+    --color-tile-8-text: #f0f9ff;
+    --color-tile-16: #1a7ab5;
+    --color-tile-16-text: #f0f9ff;
+    --color-tile-32: #1580c4;
+    --color-tile-32-text: #f0f9ff;
+    --color-tile-64: #0e6fad;
+    --color-tile-64-text: #f0f9ff;
+    --color-tile-128: #0b5f96;
+    --color-tile-128-text: #f0f9ff;
+    --color-tile-256: #0f766e;
+    --color-tile-256-text: #f0f9ff;
+    --color-tile-512: #115e59;
+    --color-tile-512-text: #f0f9ff;
+    --color-tile-1024: #d97706;
+    --color-tile-1024-text: #f0f9ff;
+    --color-tile-2048: #f59e0b;
+    --color-tile-2048-text: #0c1929;
+    --color-tile-4096: #ea580c;
+    --color-tile-4096-text: #f0f9ff;
+    --color-tile-8192: #c2410c;
+    --color-tile-8192-text: #f0f9ff;
+    --color-tile-16384: #9a3412;
+    --color-tile-16384-text: #f0f9ff;
+    --color-tile-32768: #7c2d12;
+    --color-tile-32768-text: #f0f9ff;
+    --color-tile-65536: #5c1f0e;
+    --color-tile-65536-text: #f0f9ff;
+    --color-tile-default: #152a40;
+    --color-tile-default-text: #f0f9ff;
+
+    --color-award-muted: var(--color-on-dark);
+    --color-award-inactive-bg: #234e70;
+    --color-award-gold: #f59e0b;
+    --color-award-yellow: #fbbf24;
+    --color-award-orange: #38bdf8;
+
+    --font-family: 'Source Sans Pro', Arial, sans-serif;
+}
