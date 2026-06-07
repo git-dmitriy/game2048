@@ -113,7 +113,7 @@ defineEmits<{
   left: 0;
   width: 100%;
   color: var(--color-score-inc);
-  animation: up-disappear 1.5s;
+  animation: up-disappear var(--motion-score-inc) var(--motion-ease);
 }
 
 .toolbar-button {
@@ -142,7 +142,7 @@ defineEmits<{
 }
 
 .toolbar-primary--hint {
-  animation: start-hint-pulse 1.2s ease-in-out 4;
+  animation: start-hint-pulse var(--motion-hint-pulse) var(--motion-ease-in-out) 4;
 }
 
 @keyframes start-hint-pulse {
@@ -152,7 +152,7 @@ defineEmits<{
     box-shadow: 0 0 0 0 transparent;
   }
   50% {
-    transform: scale(1.02);
+    transform: scale(1.03);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 55%, transparent);
   }
 }

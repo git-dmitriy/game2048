@@ -30,7 +30,7 @@ export function runAwardAnimation(
         awardEl.style.transition = ''
         awardEl.style.zIndex = '100'
         requestAnimationFrame(() => {
-            awardEl.style.transition = 'all 2s'
+            awardEl.style.transition = 'all var(--motion-award) var(--motion-ease)'
             awardEl.style.transform = ''
         })
     }

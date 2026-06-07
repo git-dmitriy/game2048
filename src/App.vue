@@ -231,15 +231,6 @@ const {
 }
 
 .appearing {
-  animation: appearing 1s;
-}
-
-@keyframes appearing {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  animation: appearing var(--motion-slow) var(--motion-ease);
 }
 </style>

@@ -13,4 +13,8 @@
  * Награды:      --color-award-muted, --color-award-inactive-bg,
  *               --color-award-gold, --color-award-yellow, --color-award-orange
  * Типографика:  --font-family
+ *
+ * Анимации (index.css, :root): --motion-fast, --motion-modal, --motion-slow,
+ *   --motion-score-inc, --motion-award, --motion-hint-pulse, --motion-aim-pulse,
+ *   --motion-ease, --motion-ease-in-out
  */

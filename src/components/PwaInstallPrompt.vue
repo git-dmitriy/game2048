@@ -54,7 +54,7 @@ const titleId = 'pwa-install-title'
   background-color: var(--color-bg);
   color: var(--color-text);
   box-shadow: 0 8px 32px var(--color-shadow);
-  animation: pwa-install-appear 0.25s ease-out;
+  animation: dialog-appear var(--motion-modal) var(--motion-ease);
 }
 
 .pwa-install-title {
@@ -85,16 +85,5 @@ const titleId = 'pwa-install-title'
   font-weight: bold;
   font-size: calc(var(--button-font-size) * 0.8);
   cursor: pointer;
-}
-
-@keyframes pwa-install-appear {
-  0% {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 </style>

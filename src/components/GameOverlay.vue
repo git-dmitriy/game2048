@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="overlay-wrapper">
-    <div class="overlay half-white appearing07"></div>
+    <div class="overlay half-white appearing-backdrop"></div>
     <div class="overlay game-over appearing">
       <p>{{ t('gameOver') }}</p>
     </div>
@@ -51,28 +51,10 @@ withDefaults(defineProps<{
 }
 
 .appearing {
-  animation: appearing 1s;
+  animation: appearing var(--motion-slow) var(--motion-ease);
 }
 
-.appearing07 {
-  animation: appearing07 1s;
-}
-
-@keyframes appearing {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes appearing07 {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+.appearing-backdrop {
+  animation: appearing-backdrop var(--motion-slow) var(--motion-ease);
 }
 </style>

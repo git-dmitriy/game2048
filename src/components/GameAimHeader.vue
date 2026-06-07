@@ -68,8 +68,8 @@ defineExpose({gameAimEl})
 
 .game-aim-reached {
   text-shadow: 0 0 20px var(--color-aim-reached-glow);
-  animation: pulse 1s 3;
-  transition: text-shadow 3s;
+  animation: pulse var(--motion-aim-pulse) var(--motion-ease) 3;
+  transition: text-shadow var(--motion-award) var(--motion-ease);
 }
 
 .game-aim-links {
@@ -86,7 +86,7 @@ defineExpose({gameAimEl})
   padding: 0.2em;
   color: var(--color-text);
   opacity: 0.9;
-  transition: opacity 0.2s;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 
 .game-aim-link:hover {

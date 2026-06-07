@@ -208,7 +208,7 @@ function confirmSave() {
   background-color: var(--color-bg);
   color: var(--color-text);
   box-shadow: 0 8px 32px var(--color-shadow);
-  animation: dialog-appear 0.25s ease-out;
+  animation: dialog-appear var(--motion-modal) var(--motion-ease);
 }
 
 .settings-header {
@@ -232,7 +232,7 @@ function confirmSave() {
   height: 2rem;
   padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: 8px;
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
@@ -281,7 +281,9 @@ function confirmSave() {
   font-size: calc(var(--button-font-size) * 0.75);
   color: var(--color-text);
   background-color: var(--color-panel);
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  transition: background-color var(--motion-fast) var(--motion-ease),
+  color var(--motion-fast) var(--motion-ease),
+  border-color var(--motion-fast) var(--motion-ease);
 }
 
 .option-group input[type='radio']:checked + label {
@@ -382,16 +384,5 @@ function confirmSave() {
 .confirm-ok {
   background-color: var(--color-accent);
   color: var(--color-on-dark);
-}
-
-@keyframes dialog-appear {
-  0% {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 </style>

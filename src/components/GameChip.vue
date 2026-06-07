@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<{
   moveDurationMs?: number
   moveEasing?: string
 }>(), {
-  animationTimeMs: 150,
+  animationTimeMs: 200,
   moveEasing: 'ease-out',
 })
 
@@ -38,8 +38,9 @@ watch(() => props.chip.value, () => {
     const el = chipEl.value
     if (el) {
       const d = props.animationTimeMs + 'ms'
-      el.style.animation = 'chip-value-changed ' + d
-      el.style.transition = 'background-color ' + d
+      const ease = props.moveEasing || 'ease-out'
+      el.style.animation = 'chip-value-changed ' + d + ' ' + ease
+      el.style.transition = 'background-color ' + d + ' ' + ease
     }
   })
 })
@@ -61,7 +62,9 @@ function runMoveAnimation(el: HTMLElement) {
 }
 
 function runAppearAnimation(el: HTMLElement) {
-  el.style.animation = 'chip-appear ' + props.animationTimeMs + 'ms'
+  const d = props.animationTimeMs + 'ms'
+  const ease = props.moveEasing || 'ease-out'
+  el.style.animation = 'chip-appear ' + d + ' ' + ease
 }
 
 onMounted(() => {
@@ -98,7 +101,7 @@ onMounted(() => {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.12);
   }
   100% {
     transform: scale(1);

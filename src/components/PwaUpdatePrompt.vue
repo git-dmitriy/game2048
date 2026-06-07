@@ -36,7 +36,7 @@ const {showPrompt, dismiss, applyUpdate} = usePwaUpdate()
   color: var(--color-text);
   box-shadow: 0 8px 24px var(--color-shadow);
   transform: translateX(-50%);
-  animation: pwa-update-appear 0.25s ease-out;
+  animation: dialog-appear-centered var(--motion-modal) var(--motion-ease);
 }
 
 .pwa-update-text {
@@ -69,16 +69,5 @@ const {showPrompt, dismiss, applyUpdate} = usePwaUpdate()
 .pwa-update-apply {
   background-color: var(--color-accent);
   color: var(--color-on-dark);
-}
-
-@keyframes pwa-update-appear {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(12px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
 }
 </style>

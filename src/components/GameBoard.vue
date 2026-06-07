@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<{
   listenOwnKeyEventsOnly: false,
   tabIndex: 1,
   boardSizePx: 0,
-  animationTimeMs: 150,
+  animationTimeMs: 200,
   moveEasing: 'ease-out',
   started: false,
 })

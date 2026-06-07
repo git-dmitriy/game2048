@@ -36,7 +36,7 @@ export function useScoreDisplay(
 
         const animated = {score: bestScore[size.value]}
         gsap.to(animated, {
-            duration: 0.3,
+            duration: 0.2,
             score: newScore,
             ease: 'none',
             onUpdate: () => {
@@ -58,7 +58,7 @@ export function useScoreDisplay(
 
         const animated = {score: score.value}
         gsap.to(animated, {
-            duration: 0.3,
+            duration: 0.2,
             score: args.score,
             ease: 'none',
             onUpdate: () => {
