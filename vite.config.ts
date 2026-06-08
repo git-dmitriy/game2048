@@ -65,7 +65,9 @@ export default defineConfig({
                 cleanupOutdatedCaches: true,
             },
             devOptions: {
-                enabled: true,
+                // SW в dev создаёт ложные «обновления» на каждый перезапуск Vite;
+                // проверять prompt обновления — через `npm run preview`.
+                enabled: false,
             },
         }),
     ],
