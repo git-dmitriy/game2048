@@ -21,6 +21,15 @@ export function createSwipeListener(
         st = {x: t.clientX, y: t.clientY}
     }
 
+    function onMove(e: TouchEvent) {
+        if (!st) return
+        e.preventDefault()
+    }
+
+    function onCancel() {
+        st = null
+    }
+
     function onEnd(e: TouchEvent) {
         if (!st) return
         const t = e.changedTouches[0]
@@ -38,11 +47,15 @@ export function createSwipeListener(
     return {
         attach(el: HTMLElement) {
             el.addEventListener('touchstart', onStart, {passive: true})
+            el.addEventListener('touchmove', onMove, {passive: false})
             el.addEventListener('touchend', onEnd, {passive: true})
+            el.addEventListener('touchcancel', onCancel, {passive: true})
         },
         detach(el: HTMLElement) {
             el.removeEventListener('touchstart', onStart)
+            el.removeEventListener('touchmove', onMove)
             el.removeEventListener('touchend', onEnd)
+            el.removeEventListener('touchcancel', onCancel)
         },
     }
 }

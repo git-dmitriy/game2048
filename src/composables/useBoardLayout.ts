@@ -22,8 +22,19 @@ export function getVerticalOverheadRatio(preset: GamePreset): number {
         overhead += ratios.awardsHeight
     }
 
-    overhead += 0.07
+    // Aim header height, scaled with board width
+    overhead += 0.05
     return overhead
+}
+
+export function getLayoutRowGapCount(preset: GamePreset): number {
+    return preset.features.awards ? 4 : 3
+}
+
+export function getLayoutFixedChrome(preset: GamePreset): string {
+    const verticalPaddingPx = preset.board.layoutVerticalPaddingPx ?? 32
+    const gapCount = getLayoutRowGapCount(preset)
+    return `calc(${verticalPaddingPx}px + ${gapCount} * 1rem + 1.25em)`
 }
 
 export function useBoardLayout(preset: GamePreset, containerRef?: Ref<HTMLElement | null>) {
@@ -43,9 +54,10 @@ export function useBoardLayout(preset: GamePreset, containerRef?: Ref<HTMLElemen
     const sizingVars = computed(() => ({
         '--board-min': minPx + 'px',
         '--board-max': maxPx + 'px',
-        '--board-width-cap': `min(${widthRatio * 100}vw, ${maxPx}px)`,
+        '--board-width-cap': `min(${widthRatio * 100}%, ${maxPx}px)`,
         '--vertical-overhead': String(verticalOverhead),
         '--layout-vertical-padding': verticalPaddingPx + 'px',
+        '--layout-fixed-chrome': getLayoutFixedChrome(preset),
     }))
 
     const layoutVars = computed(() => {

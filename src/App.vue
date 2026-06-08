@@ -184,19 +184,24 @@ const {
       var(--board-min),
       min(
           var(--board-width-cap),
-          calc((100dvh - var(--layout-vertical-padding)) / var(--vertical-overhead)),
-          calc((100vh - var(--layout-vertical-padding)) / var(--vertical-overhead)),
+          100%,
+          calc((100dvh - var(--layout-fixed-chrome)) / var(--vertical-overhead)),
+          calc((100vh - var(--layout-fixed-chrome)) / var(--vertical-overhead)),
           var(--board-max)
       ),
       var(--board-max)
   );
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 1rem;
   margin: 0 auto;
   padding: 2%;
   width: var(--board-size);
-  max-width: 100vw;
+  max-width: 100%;
+  max-height: 100%;
+  height: 100%;
   transform: translateZ(0);
 }
 
