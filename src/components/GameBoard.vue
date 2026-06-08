@@ -120,6 +120,7 @@ onMounted(() => {
   align-items: space-around;
   background-color: var(--color-board);
   outline: none;
+  touch-action: none;
 }
 
 .cell {

@@ -1,29 +1,34 @@
 import {ref, watch} from 'vue'
-import {useRegisterSW} from 'virtual:pwa-register/vue'
+import {applyPwaUpdate, pwaNeedRefresh, pwaUpdateInProgress} from '../pwa/register'
 
 export function usePwaUpdate() {
     const dismissed = ref(false)
 
-    const {needRefresh, updateServiceWorker} = useRegisterSW({
-        onRegisterError(error) {
-            console.error('Service worker registration failed:', error)
-        },
-    })
-
-    watch(needRefresh, (value) => {
-        if (value) {
+    watch(pwaNeedRefresh, (value) => {
+        if (value && !pwaUpdateInProgress.value) {
             dismissed.value = false
         }
     })
 
-    const showPrompt = () => needRefresh.value && !dismissed.value
+    const showPrompt = () => pwaNeedRefresh.value && !dismissed.value && !pwaUpdateInProgress.value
 
     function dismiss(): void {
         dismissed.value = true
     }
 
     async function applyUpdate(): Promise<void> {
-        await updateServiceWorker(true)
+        if (pwaUpdateInProgress.value) return
+
+        pwaUpdateInProgress.value = true
+        dismissed.value = true
+
+        try {
+            await applyPwaUpdate()
+        } catch (error) {
+            pwaUpdateInProgress.value = false
+            dismissed.value = false
+            console.error('Service worker update failed:', error)
+        }
     }
 
     return {

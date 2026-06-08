@@ -14,6 +14,7 @@ import {activePreset} from './config/activePreset'
 import {applyUiTheme, normalizeUiThemeId} from './config/themes'
 import {gamePresetKey, tileThemeKey} from './config/injectionKeys'
 import i18n from './i18n'
+import './pwa/register'
 
 applyUiTheme(normalizeUiThemeId(activePreset.theme))
 
