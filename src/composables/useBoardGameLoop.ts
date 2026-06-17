@@ -35,6 +35,9 @@ export interface BoardGameLoopCallbacks {
     onAimChanged: (aim: number) => void
     onAimReached: () => void
     onSessionUpdate: (snapshot: Game2048Snapshot) => void
+    onMove?: () => void
+    onMerge?: (consolidations: ChipCoord[]) => void
+    onSpawn?: (count: number) => void
 }
 
 interface BoardGameLoopOptions {
@@ -78,7 +81,13 @@ export function useBoardGameLoop({
         let moveCooldownUntil = 0
 
         const consolidateAndAddChipsDeferred = deferred(toValue(animationTimeMs), () => {
+            if (boardChanges.consolidations.length > 0) {
+                callbacks.onMerge?.(boardChanges.consolidations)
+            }
             chipModel.consolidateChips(boardChanges.consolidations)
+            if (newChips.length > 0) {
+                callbacks.onSpawn?.(newChips.length)
+            }
             chipModel.addChips(newChips)
         })
 
@@ -107,6 +116,7 @@ export function useBoardGameLoop({
 
             chipModel.moveChips(boardChanges.moves)
             if (boardChanges.moves.length > 0) {
+                callbacks.onMove?.()
                 moveCooldownUntil = Date.now() + moveDuration
             }
             consolidateAndAddChipsDeferred.renew()

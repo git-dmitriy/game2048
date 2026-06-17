@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "generate:pwa-assets": "node scripts/generate-pwa-assets.mjs",
-    "prebuild": "npm run generate:pwa-assets"
+    "generate:sounds": "node scripts/generate-sounds.mjs",
+    "prebuild": "npm run generate:pwa-assets && npm run generate:sounds"
   },
   "dependencies": {
     "@iconify/vue": "^5.0.1",

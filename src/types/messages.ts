@@ -8,6 +8,9 @@ export interface MessageSchema {
     boardSize: string
     colorScheme: string
     language: string
+    sound: string
+    soundOn: string
+    soundOff: string
     save: string
     confirm: string
     cancel: string

@@ -18,6 +18,8 @@ export type ScoreAnimation = 'gsap' | 'none'
 
 export type AwardAnimation = 'fly' | 'none'
 
+export type SoundPolicy = 'default' | 'none'
+
 export type ListenKeysOn = 'document' | 'board'
 
 export type MoveDirection = 'left' | 'right' | 'up' | 'down'
@@ -34,6 +36,7 @@ export interface GameSettings {
     size?: number
     theme?: UiThemeId | string
     locale?: LocaleId | string
+    soundEnabled?: boolean
 }
 
 export interface GameAwardState {
@@ -109,6 +112,8 @@ export interface GamePreset {
         startGameHint: boolean
         scoreAnimation: ScoreAnimation | string
         awardAnimation: AwardAnimation | string
+        sounds: SoundPolicy | boolean
+        soundVolume?: number
     }
     persistence: {
         storage: PersistenceStorage | string

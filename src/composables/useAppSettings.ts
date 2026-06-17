@@ -9,6 +9,7 @@ export interface AppSettingsState {
     size: number
     theme: UiThemeId
     locale: ReturnType<typeof detectLocale>
+    soundEnabled: boolean
 }
 
 interface UseAppSettingsDeps {
@@ -46,7 +47,7 @@ export function useAppSettings({
         showSettings.value = false
     }
 
-    function onSettingsSave({boardSize, colorTheme, locale, resetGame}: SettingsSavePayload): void {
+    function onSettingsSave({boardSize, colorTheme, locale, soundEnabled, resetGame}: SettingsSavePayload): void {
         if (resetGame) {
             gameStarted.value = false
             gameEnded.value = false
@@ -59,6 +60,7 @@ export function useAppSettings({
         appSettings.size = boardSize
         appSettings.theme = colorTheme
         appSettings.locale = setAppLocale(locale)
+        appSettings.soundEnabled = soundEnabled
         applyUiTheme(colorTheme)
         gameAim.value = getWinTile(preset, boardSize)
         showSettings.value = false

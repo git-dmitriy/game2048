@@ -13,15 +13,24 @@ interface BoardInputOptions {
     boardEl: MaybeRefOrGetter<HTMLElement | null>
     listenOwnKeyEventsOnly: MaybeRefOrGetter<boolean>
     swipeSensitivity: number
+    onFirstInteraction?: () => void
 }
 
 export function useBoardInput({
                                   boardEl,
                                   listenOwnKeyEventsOnly,
                                   swipeSensitivity,
+                                  onFirstInteraction,
                               }: BoardInputOptions) {
     let keydownCleanup: (() => void) | null = null
     let swipeDetach: (() => void) | null = null
+    let interactionFired = false
+
+    function fireFirstInteraction(): void {
+        if (interactionFired) return
+        interactionFired = true
+        onFirstInteraction?.()
+    }
 
     function runKeyboardControl(doGameMove: (direction: MoveDirection) => void): void {
         const listenKeysOn = toValue(listenOwnKeyEventsOnly) ? toValue(boardEl) : document
@@ -32,6 +41,7 @@ export function useBoardInput({
             const direction = KEY_MAP[ke.keyCode]
             if (direction == null) return
             e.preventDefault()
+            fireFirstInteraction()
             doGameMove(direction)
         }
 
@@ -42,7 +52,10 @@ export function useBoardInput({
     }
 
     function runTouchControl(doGameMove: (direction: MoveDirection) => void): void {
-        const swipe = createSwipeListener((direction) => doGameMove(direction), {
+        const swipe = createSwipeListener((direction) => {
+            fireFirstInteraction()
+            doGameMove(direction)
+        }, {
             sensitivity: swipeSensitivity,
         })
         const el = toValue(boardEl)

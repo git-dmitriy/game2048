@@ -39,6 +39,28 @@
         </section>
 
         <section class="settings-section">
+          <h3 class="settings-label">{{ t('sound') }}</h3>
+          <div class="option-group">
+            <input
+                id="settings-sound-on"
+                v-model="draftSoundEnabled"
+                type="radio"
+                name="sound"
+                :value="true"
+            />
+            <label for="settings-sound-on">{{ t('soundOn') }}</label>
+            <input
+                id="settings-sound-off"
+                v-model="draftSoundEnabled"
+                type="radio"
+                name="sound"
+                :value="false"
+            />
+            <label for="settings-sound-off">{{ t('soundOff') }}</label>
+          </div>
+        </section>
+
+        <section class="settings-section">
           <h3 class="settings-label">{{ t('boardSize') }}</h3>
           <div class="option-group">
             <template v-for="s in sizes" :key="'size-' + s">
@@ -123,10 +145,12 @@ const props = withDefaults(defineProps<{
   boardSize: number
   colorTheme: UiThemeId | string
   locale: LocaleId | string
+  soundEnabled?: boolean
   gameStarted?: boolean
 }>(), {
   visible: false,
   gameStarted: false,
+  soundEnabled: true,
 })
 
 const emit = defineEmits<{
@@ -137,6 +161,7 @@ const emit = defineEmits<{
 const draftSize = ref(props.boardSize)
 const draftTheme = ref(normalizeUiThemeId(props.colorTheme))
 const draftLocale = ref(normalizeLocale(props.locale))
+const draftSoundEnabled = ref(props.soundEnabled)
 const showResetConfirm = ref(false)
 
 watch(() => props.visible, (open) => {
@@ -147,6 +172,7 @@ watch(() => props.visible, (open) => {
   draftSize.value = props.boardSize
   draftTheme.value = normalizeUiThemeId(props.colorTheme)
   draftLocale.value = normalizeLocale(props.locale)
+  draftSoundEnabled.value = props.soundEnabled
 })
 
 function requestClose() {
@@ -171,6 +197,7 @@ function confirmSave() {
     boardSize: draftSize.value,
     colorTheme: normalizeUiThemeId(draftTheme.value),
     locale: normalizeLocale(draftLocale.value),
+    soundEnabled: draftSoundEnabled.value,
     resetGame: needsResetConfirm(),
   })
   showResetConfirm.value = false

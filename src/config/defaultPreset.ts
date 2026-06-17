@@ -46,6 +46,8 @@ export const defaultPreset: GamePreset = {
         startGameHint: true,
         scoreAnimation: 'gsap',
         awardAnimation: 'fly',
+        sounds: 'default',
+        soundVolume: 0.6,
     },
 
     persistence: {

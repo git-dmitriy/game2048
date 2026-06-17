@@ -34,6 +34,7 @@ import {useBoardGeometry} from '../composables/useBoardGeometry'
 import {useBoardInput} from '../composables/useBoardInput'
 import {useBoardChipModel} from '../composables/useBoardChipModel'
 import {useBoardGameLoop} from '../composables/useBoardGameLoop'
+import type {BoardSoundCallbacks} from '../composables/useGameSounds'
 import type {Game2048Snapshot} from '../types/game'
 
 const preset = useGamePreset()
@@ -47,6 +48,8 @@ const props = withDefaults(defineProps<{
   moveDurationMs?: number
   moveEasing?: string
   started?: boolean
+  boardSoundCallbacks?: BoardSoundCallbacks
+  onSoundUnlock?: () => void
 }>(), {
   listenOwnKeyEventsOnly: false,
   tabIndex: 1,
@@ -78,6 +81,7 @@ const boardInput = useBoardInput({
   boardEl,
   listenOwnKeyEventsOnly: toRef(props, 'listenOwnKeyEventsOnly'),
   swipeSensitivity: preset.input.swipeSensitivity,
+  onFirstInteraction: () => props.onSoundUnlock?.(),
 })
 
 const chipModel = useBoardChipModel({
@@ -102,6 +106,9 @@ const {restoreSession} = useBoardGameLoop({
     onAimChanged: (aim) => emit('aim-changed', aim),
     onAimReached: () => emit('aim-reached'),
     onSessionUpdate: (snapshot) => emit('session-update', snapshot),
+    onMove: () => props.boardSoundCallbacks?.onMove?.(),
+    onMerge: (consolidations) => props.boardSoundCallbacks?.onMerge?.(consolidations),
+    onSpawn: (count) => props.boardSoundCallbacks?.onSpawn?.(count),
   },
 })
 

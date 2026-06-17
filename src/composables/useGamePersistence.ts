@@ -64,6 +64,7 @@ export function useGamePersistence(preset: GamePreset, stores: PersistenceStores
                 size: stores.settings.size,
                 theme: stores.settings.theme,
                 locale: stores.settings.locale,
+                soundEnabled: stores.settings.soundEnabled,
             }
         }
 
@@ -90,6 +91,9 @@ export function useGamePersistence(preset: GamePreset, stores: PersistenceStores
             }
             if (typeof state.settings.locale === 'string') {
                 stores.settings.locale = normalizeLocale(state.settings.locale)
+            }
+            if (typeof state.settings.soundEnabled === 'boolean') {
+                stores.settings.soundEnabled = state.settings.soundEnabled
             }
         }
 

@@ -1,4 +1,4 @@
-import {reactive, ref, watch, onMounted, type ComponentPublicInstance, type Ref} from 'vue'
+import {reactive, ref, watch, onMounted, computed, type ComponentPublicInstance, type Ref} from 'vue'
 import {useGamePreset} from './useGamePreset'
 import {useAppComponents} from './useAppComponents'
 import {useBoardLayout} from './useBoardLayout'
@@ -10,6 +10,7 @@ import {useStartGameHint} from './useStartGameHint'
 import {useGameMeta} from './useGameMeta'
 import {useAppSettings, type AppSettingsState} from './useAppSettings'
 import {useAwards} from './useAwards'
+import {useGameSounds} from './useGameSounds'
 import {getWinTile} from '../config/defaultPreset'
 import {applyUiTheme, normalizeUiThemeId} from '../config/themes'
 import {detectLocale, setAppLocale} from '../i18n'
@@ -31,6 +32,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         size: defSize,
         theme: normalizeUiThemeId(preset.theme),
         locale: detectLocale(),
+        soundEnabled: true,
     })
 
     const savedSession = ref<GameSession | null>(null)
@@ -57,6 +59,22 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         bestScore,
         flushPersistState,
     )
+
+    const soundEnabled = computed({
+        get: () => appSettings.soundEnabled,
+        set: (value: boolean) => {
+            appSettings.soundEnabled = value
+        },
+    })
+
+    const {
+        unlock: unlockSounds,
+        preload: preloadSounds,
+        playWin,
+        playGameOver,
+        playNewGame,
+        boardCallbacks: boardSoundCallbacks,
+    } = useGameSounds(preset, soundEnabled)
 
     const {
         showSettings,
@@ -110,11 +128,13 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
 
     function startGame(): void {
         dismissStartHint()
+        unlockSounds()
         clearSession()
         gameEnded.value = false
         gameAimReached.value = false
         gameStarted.value = true
         resetScore()
+        playNewGame()
     }
 
     function onGameStarted(): void {
@@ -125,6 +145,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
     function onGameEnded(): void {
         gameStarted.value = false
         gameEnded.value = true
+        playGameOver()
         syncSessionOnEnd()
     }
 
@@ -134,6 +155,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
 
     function onGameAimReached(): void {
         gameAimReached.value = true
+        playWin()
         syncSessionOnAimReached()
         handleAimReached()
     }
@@ -150,6 +172,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         appSettings.locale = setAppLocale(appSettings.locale)
         gameAim.value = getWinTile(preset, savedSize)
         applyUiTheme(appSettings.theme)
+        preloadSounds()
         await restoreSavedSession()
         requestAnimationFrame(() => {
             isVisible.value = true
@@ -191,5 +214,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         onGameAimChanged,
         onGameAimReached,
         onSessionUpdate,
+        boardSoundCallbacks,
+        unlockSounds,
     }
 }

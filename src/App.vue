@@ -68,6 +68,8 @@
               :animation-time-ms="timing.animationMs"
               :move-duration-ms="timing.moveMs"
               :move-easing="timing.moveEasing"
+              :board-sound-callbacks="boardSoundCallbacks"
+              :on-sound-unlock="unlockSounds"
               @started="onGameStarted"
               @ended="onGameEnded"
               @score="onGameScore"
@@ -109,6 +111,7 @@
         :board-size="size"
         :color-theme="appSettings.theme"
         :locale="appSettings.locale"
+        :sound-enabled="appSettings.soundEnabled"
         :game-started="gameStarted"
         @close="closeSettings"
         @save="onSettingsSave"
@@ -119,6 +122,7 @@
           :board-size="size"
           :color-theme="appSettings.theme"
           :locale="appSettings.locale"
+          :sound-enabled="appSettings.soundEnabled"
           :game-started="gameStarted"
           @close="closeSettings"
           @save="onSettingsSave"
@@ -175,6 +179,8 @@ const {
   onGameAimChanged,
   onGameAimReached,
   onSessionUpdate,
+  boardSoundCallbacks,
+  unlockSounds,
 } = useGameController(gameContainerEl)
 </script>
 
