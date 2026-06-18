@@ -1,11 +1,19 @@
 <template>
   <footer class="app-copyright">
-    <p class="app-copyright-text">© {{ year }} Dmitriy Shalberkin · MIT License</p>
+    <p class="app-copyright-text">
+      © {{ year }} Dmitriy Shalberkin ·
+      <a
+          class="app-copyright-link"
+          href="https://github.com/git-dmitriy/game2048/blob/master/LICENSE"
+          target="_blank"
+          rel="license noopener noreferrer"
+      >MIT License</a>
+    </p>
   </footer>
 </template>
 
 <script setup lang="ts">
-const year = 2026
+const year = new Date().getFullYear()
 </script>
 
 <style scoped>
@@ -21,5 +29,14 @@ const year = 2026
   line-height: 1.3;
   color: var(--color-text);
   opacity: 0.75;
+}
+
+.app-copyright-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-copyright-link:hover {
+  text-decoration: underline;
 }
 </style>

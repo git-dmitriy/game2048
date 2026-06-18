@@ -574,6 +574,14 @@ Version history is in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
+## Acknowledgments
+
+Inspired by the original [2048](https://github.com/gabrielecirulli/2048) by Gabriele Cirulli (MIT).
+
+---
+
 ## License
 
 [MIT](LICENSE) © 2026 Dmitriy Shalberkin
+
+Third-party software and assets are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Score animation uses [GSAP](https://gsap.com/) under the [GreenSock Standard License](https://gsap.com/standard-license/).

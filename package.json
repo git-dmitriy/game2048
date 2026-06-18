@@ -3,6 +3,13 @@
   "private": true,
   "license": "MIT",
   "version": "1.0.0",
+  "author": "Dmitriy Shalberkin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/git-dmitriy/game2048.git"
+  },
+  "bugs": "https://github.com/git-dmitriy/game2048/issues",
+  "homepage": "https://github.com/git-dmitriy/game2048#readme",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
