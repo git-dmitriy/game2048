@@ -8,7 +8,7 @@ Supports board sizes from 3×3 to 6×6, per-size high scores, goal achievements,
 
 - Board sizes 3×3, 4×4, 5×5, and 6×6 with different win targets (256 … 8192)
 - Keyboard (arrow keys) and swipe controls on mobile
-- Tile, score (GSAP), and award (`fly`) animations
+- Tile, animated score counter, and award (`fly`) animations
 - Sound effects for moves, merges, spawns, win, and game over (toggle in settings)
 - 8 UI color schemes (classic, ocean, forest, sunset + dark variants)
 - Settings: board size, theme, language, sound on/off
@@ -23,7 +23,6 @@ Supports board sizes from 3×3 to 6×6, per-size high scores, goal achievements,
 | TypeScript + vue-tsc | Type checking |
 | Vite 5 | Build tool and dev server |
 | vue-i18n | Localization |
-| GSAP | Score animation |
 | Web Audio API | Sound effects |
 | @iconify/vue | Icons |
 | vite-plugin-pwa | Service Worker and manifest |
@@ -151,7 +150,7 @@ createApp(App)
 | `useGameMeta` | Initialize awards, bestScore, sizes |
 | `useGamePersistence` | Debounced save to localStorage |
 | `useAppGameSession` | Restore game session after reload |
-| `useScoreDisplay` | Score, increment display, GSAP animation |
+| `useScoreDisplay` | Score, increment display, count-up animation |
 | `useAppSettings` | Settings modal |
 | `useAwards` | Award list, refs, fly animation |
 | `useBoardLayout` | Layout CSS variables (`--board-size`, …) |
@@ -245,7 +244,6 @@ export const activePreset = createPreset({
   },
   features: {
     awardAnimation: 'none',
-    scoreAnimation: 'none',
     sounds: 'none',
   },
   persistence: {
@@ -286,6 +284,7 @@ Default (non-classic 2048): `spawnsPerMove = max(1, size - 3)`, `initialSpawns =
 | `animationMs` | Merge/spawn animation duration |
 | `moveMs` | Tile movement duration |
 | `moveEasing` | CSS easing (`ease-out`, …) |
+| `scoreAnimationMs` | Score and best-score count-up duration (default `200`) |
 
 #### `features`
 
@@ -294,7 +293,6 @@ Default (non-classic 2048): `spawnsPerMove = max(1, size - 3)`, `initialSpawns =
 | `awards` | Show awards block |
 | `bestScorePerSize` | Separate high score per board size |
 | `startGameHint` | Pulse animation on "New Game" button |
-| `scoreAnimation` | `'gsap'` \| `'none'` |
 | `awardAnimation` | `'fly'` \| `'none'` |
 | `sounds` | `'default'` \| `'none'` — enable or disable sound effects |
 | `soundVolume` | Master volume 0…1 (default `0.6`) |
@@ -492,7 +490,7 @@ src/
 │   ├── useGameMeta.ts         # awards, bestScore, sizes
 │   ├── useGamePersistence.ts  # localStorage
 │   ├── useAppGameSession.ts   # session restore
-│   ├── useScoreDisplay.ts     # score + GSAP
+│   ├── useScoreDisplay.ts     # score + count-up animation
 │   ├── useAppSettings.ts      # settings
 │   ├── useAwards.ts           # awards
 │   ├── useGameSounds.ts       # sound effects
@@ -583,5 +581,3 @@ Inspired by the original [2048](https://github.com/gabrielecirulli/2048) by Gabr
 ## License
 
 [MIT](LICENSE) © 2026 Dmitriy Shalberkin
-
-Third-party software and assets are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Score animation uses [GSAP](https://gsap.com/) under the [GreenSock Standard License](https://gsap.com/standard-license/).

@@ -38,13 +38,13 @@ export const defaultPreset: GamePreset = {
         animationMs: 200,
         moveMs: 200,
         moveEasing: 'ease-out',
+        scoreAnimationMs: 200,
     },
 
     features: {
         awards: true,
         bestScorePerSize: true,
         startGameHint: true,
-        scoreAnimation: 'gsap',
         awardAnimation: 'fly',
         sounds: 'default',
         soundVolume: 0.6,

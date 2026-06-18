@@ -1,5 +1,5 @@
 import {ref, nextTick, type Ref} from 'vue'
-import {gsap} from 'gsap'
+import {animateNumber, prefersReducedMotion} from '../lib/animateNumber'
 import type {GamePreset} from '../types/game'
 
 interface ScoreUpdatePayload {
@@ -13,9 +13,19 @@ export function useScoreDisplay(
     bestScore: Record<number, number>,
     flushPersistState: () => void,
 ) {
-    const {features} = preset
+    const {features, timing} = preset
+    const scoreAnimationMs = timing.scoreAnimationMs ?? 200
     const score = ref(0)
     const scoreInc = ref('')
+    let cancelScoreAnimation: (() => void) | null = null
+    let cancelBestScoreAnimation: (() => void) | null = null
+
+    function stopScoreAnimations(): void {
+        cancelScoreAnimation?.()
+        cancelScoreAnimation = null
+        cancelBestScoreAnimation?.()
+        cancelBestScoreAnimation = null
+    }
 
     function showScoreIncrement(inc: number): void {
         scoreInc.value = inc + '+'
@@ -29,26 +39,30 @@ export function useScoreDisplay(
             return false
         }
 
-        if (features.scoreAnimation !== 'gsap') {
+        if (prefersReducedMotion()) {
             bestScore[size.value] = newScore
             return true
         }
 
-        const animated = {score: bestScore[size.value]}
-        gsap.to(animated, {
-            duration: 0.2,
-            score: newScore,
-            ease: 'none',
-            onUpdate: () => {
-                bestScore[size.value] = Math.floor(animated.score)
+        cancelBestScoreAnimation?.()
+        const from = bestScore[size.value]
+        cancelBestScoreAnimation = animateNumber(
+            from,
+            newScore,
+            scoreAnimationMs,
+            (value) => {
+                bestScore[size.value] = value
             },
-            onComplete: () => flushPersistState(),
-        })
+            () => {
+                cancelBestScoreAnimation = null
+                flushPersistState()
+            },
+        )
         return false
     }
 
     function onGameScore(args: ScoreUpdatePayload): void {
-        if (features.scoreAnimation !== 'gsap') {
+        if (prefersReducedMotion()) {
             score.value = args.score
             const bestScoreUpdated = updateBestScore(args.score)
             showScoreIncrement(args.scoreInc)
@@ -56,21 +70,26 @@ export function useScoreDisplay(
             return
         }
 
-        const animated = {score: score.value}
-        gsap.to(animated, {
-            duration: 0.2,
-            score: args.score,
-            ease: 'none',
-            onUpdate: () => {
-                score.value = Math.floor(animated.score)
+        cancelScoreAnimation?.()
+        cancelScoreAnimation = animateNumber(
+            score.value,
+            args.score,
+            scoreAnimationMs,
+            (value) => {
+                score.value = value
             },
-        })
+            () => {
+                cancelScoreAnimation = null
+            },
+        )
 
-        updateBestScore(args.score)
+        const bestScoreUpdated = updateBestScore(args.score)
         showScoreIncrement(args.scoreInc)
+        if (bestScoreUpdated) flushPersistState()
     }
 
     function resetScore(): void {
+        stopScoreAnimations()
         score.value = 0
         scoreInc.value = ''
     }

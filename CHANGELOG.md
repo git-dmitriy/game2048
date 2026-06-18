@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Replaced GSAP score animation with native requestAnimationFrame counter
+- Removed THIRD_PARTY_NOTICES.md
+
+### Removed
+
+- gsap dependency
+- `features.scoreAnimation` preset option
+
 ## [1.0.0] - 2026-06-18
 
 ### Added

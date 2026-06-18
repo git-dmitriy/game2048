@@ -14,8 +14,6 @@ export type LocaleId = 'ru' | 'en' | 'de' | 'it' | 'es'
 
 export type PersistenceStorage = 'localStorage' | 'none'
 
-export type ScoreAnimation = 'gsap' | 'none'
-
 export type AwardAnimation = 'fly' | 'none'
 
 export type SoundPolicy = 'default' | 'none'
@@ -105,12 +103,12 @@ export interface GamePreset {
         animationMs: number
         moveMs: number
         moveEasing: string
+        scoreAnimationMs: number
     }
     features: {
         awards: boolean
         bestScorePerSize: boolean
         startGameHint: boolean
-        scoreAnimation: ScoreAnimation | string
         awardAnimation: AwardAnimation | string
         sounds: SoundPolicy | boolean
         soundVolume?: number
