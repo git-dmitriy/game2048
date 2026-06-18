@@ -560,6 +560,20 @@ Path alias `@/*` → `src/*` is configured in `tsconfig.json` (optional for impo
 
 ---
 
+## Releases
+
+Version history is in [CHANGELOG.md](CHANGELOG.md).
+
+### Creating a release
+
+1. Merge changes to `master`
+2. `npm run typecheck && npm run build`
+3. `npm run release` (or `release:patch` / `release:minor` / `release:major`)
+4. `git push --follow-tags origin master`
+5. `gh release create vX.Y.Z --title "vX.Y.Z" --notes "<section from CHANGELOG>"`
+
+---
+
 ## License
 
 [MIT](LICENSE) © 2026 Dmitriy Shalberkin
