@@ -1,77 +1,81 @@
 # 2048 Game (Vue 3 + TypeScript)
 
-Классическая игра 2048 на **Vue 3**, **TypeScript** и **Vite**. Проект построен вокруг системы **пресетов**: правила, внешний вид, поведение UI и сохранение настраиваются без переписывания игровой логики.
+A classic 2048 game built with **Vue 3**, **TypeScript**, and **Vite**. The project is organized around a **preset** system: rules, appearance, UI behavior, and persistence can be customized without rewriting the core game logic.
 
-Поддерживаются размеры поля 3×3–6×6, рекорды по размеру, награды за достижение цели, **i18n** (RU / EN / DE / IT / ES), **PWA**, восстановление сессии после перезагрузки страницы.
+Supports board sizes from 3×3 to 6×6, per-size high scores, goal achievements, **i18n** (RU / EN / DE / IT / ES), **PWA**, session restore after page reload, and **sound effects**.
 
-## Возможности
+## Features
 
-- Игровое поле 3×3, 4×4, 5×5, 6×6 с разными целями (256 … 8192)
-- Клавиатура (стрелки) и свайпы на мобильных
-- Анимации плиток, счёта (GSAP) и награды (`fly`)
-- 8 цветовых схем UI (classic, ocean, forest, sunset + dark-варианты)
-- Настройки: размер поля, тема, язык
-- Сохранение в `localStorage`: рекорды, награды, настройки, **текущая партия**
-- PWA: установка на домашний экран, offline-кэш, prompt обновления
+- Board sizes 3×3, 4×4, 5×5, and 6×6 with different win targets (256 … 8192)
+- Keyboard (arrow keys) and swipe controls on mobile
+- Tile, score (GSAP), and award (`fly`) animations
+- Sound effects for moves, merges, spawns, win, and game over (toggle in settings)
+- 8 UI color schemes (classic, ocean, forest, sunset + dark variants)
+- Settings: board size, theme, language, sound on/off
+- `localStorage` persistence: high scores, awards, settings, and **current game session**
+- PWA: add to home screen, offline cache, update prompt
 
-## Стек
+## Tech stack
 
-| Технология | Назначение |
+| Technology | Purpose |
 |---|---|
 | Vue 3 (Composition API) | UI |
-| TypeScript + vue-tsc | типизация |
-| Vite 5 | сборка и dev-сервер |
-| vue-i18n | локализация |
-| GSAP | анимация счёта |
-| @iconify/vue | иконки |
-| vite-plugin-pwa | Service Worker и manifest |
+| TypeScript + vue-tsc | Type checking |
+| Vite 5 | Build tool and dev server |
+| vue-i18n | Localization |
+| GSAP | Score animation |
+| Web Audio API | Sound effects |
+| @iconify/vue | Icons |
+| vite-plugin-pwa | Service Worker and manifest |
 
-## Быстрый старт
+## Quick start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Откройте http://localhost:5173/
+Open http://localhost:5173/
 
-### Другие команды
+### Other commands
 
 ```bash
-npm run build      # production-сборка в dist/
-npm run preview    # предпросмотр сборки
-npm run typecheck  # проверка типов (vue-tsc)
+npm run build            # production build to dist/
+npm run preview          # preview production build
+npm run typecheck        # type check (vue-tsc)
+npm run generate:sounds  # generate procedural WAV assets (runs on prebuild)
 ```
 
 ---
 
-## Архитектура
+## Architecture
 
-Проект разделён на слои с чёткой ответственностью:
+The project is split into layers with clear responsibilities:
 
 ```mermaid
 flowchart TB
-  subgraph entry [Точка входа]
+  subgraph entry [Entry point]
     main[main.ts]
     preset[activePreset.ts]
   end
 
-  subgraph app [Приложение]
+  subgraph app [Application]
     App[App.vue]
     ctrl[useGameController]
   end
 
-  subgraph board [Доска]
+  subgraph board [Board]
     GB[GameBoard.vue]
     loop[useBoardGameLoop]
     engine[lib/game2048.ts]
   end
 
-  subgraph infra [Инфраструктура]
+  subgraph infra [Infrastructure]
     persist[useGamePersistence]
     i18n[i18n + locales]
     themes[CSS themes]
     pwa[PWA]
+    sounds[useGameSounds]
   end
 
   main --> App
@@ -81,18 +85,19 @@ flowchart TB
   GB --> loop --> engine
   ctrl --> persist
   ctrl --> i18n
+  ctrl --> sounds
   App --> pwa
 ```
 
-### Принципы
+### Principles
 
-1. **Пресет (`GamePreset`)** — единый конфиг игры: правила, тайминги, фичи, persistence, input.
-2. **Движок (`lib/game2048.ts`)** — чистый TypeScript без Vue; источник истины для правил.
-3. **Composables** — бизнес-логика (сессия, счёт, input, chip-модель).
-4. **Компоненты** — тонкий UI; `App.vue` и `GameBoard.vue` в основном склеивают composables.
-5. **Provide/inject** — пресет и тема плиток доступны через `useGamePreset()` / `useTileTheme()`.
+1. **Preset (`GamePreset`)** — single game config: rules, timings, features, persistence, input.
+2. **Engine (`lib/game2048.ts`)** — pure TypeScript without Vue; source of truth for game rules.
+3. **Composables** — business logic (session, score, input, chip model, sounds).
+4. **Components** — thin UI; `App.vue` and `GameBoard.vue` mostly wire composables together.
+5. **Provide/inject** — preset and tile theme available via `useGamePreset()` / `useTileTheme()`.
 
-### Поток одного хода
+### Turn flow
 
 ```mermaid
 sequenceDiagram
@@ -103,29 +108,29 @@ sequenceDiagram
   participant Chip as useBoardChipModel
   participant App as useGameController
 
-  User->>Input: стрелка / свайп
+  User->>Input: arrow key / swipe
   Input->>Loop: MoveDirection
   Loop->>Engine: left / right / up / down
   Engine-->>Loop: moves, consolidations, scoreInc
   Loop->>Chip: moveChips, deferred consolidate
   Loop->>App: score, session-update, aim-reached
   Loop->>Engine: spawnTiles, canMove?
-  alt нет ходов
+  alt no moves left
     Loop->>App: ended (Game over)
   end
 ```
 
 ---
 
-## Точка входа
+## Entry point
 
 `src/main.ts`:
 
-1. Подключает CSS тем UI и плиток.
-2. Применяет начальную UI-тему из пресета (`applyUiTheme`).
-3. Создаёт Vue-приложение, подключает `vue-i18n`.
-4. Делает **provide** пресета и темы плиток.
-5. Монтирует `App.vue`.
+1. Loads UI and tile theme CSS.
+2. Applies the initial UI theme from the preset (`applyUiTheme`).
+3. Creates the Vue app and registers `vue-i18n`.
+4. **Provides** the preset and tile theme.
+5. Mounts `App.vue`.
 
 ```ts
 createApp(App)
@@ -137,67 +142,69 @@ createApp(App)
 
 ---
 
-## Уровень приложения (`App.vue`)
+## Application layer (`App.vue`)
 
-`App.vue` — layout и **слоты** для white-label кастомизации. Вся логика в **`useGameController`**:
+`App.vue` is the layout and **slots** for white-label customization. All logic lives in **`useGameController`**:
 
-| Composable | Назначение |
+| Composable | Purpose |
 |---|---|
-| `useGameMeta` | инициализация awards, bestScore, sizes |
-| `useGamePersistence` | debounced save в localStorage |
-| `useAppGameSession` | восстановление партии после reload |
-| `useScoreDisplay` | счёт, инкремент, GSAP-анимация |
-| `useAppSettings` | модалка настроек |
-| `useAwards` | список наград, refs, fly-анимация |
-| `useBoardLayout` | CSS-переменные layout (`--board-size`, …) |
-| `useStartGameHint` | подсказка «Новая игра» |
+| `useGameMeta` | Initialize awards, bestScore, sizes |
+| `useGamePersistence` | Debounced save to localStorage |
+| `useAppGameSession` | Restore game session after reload |
+| `useScoreDisplay` | Score, increment display, GSAP animation |
+| `useAppSettings` | Settings modal |
+| `useAwards` | Award list, refs, fly animation |
+| `useBoardLayout` | Layout CSS variables (`--board-size`, …) |
+| `useStartGameHint` | "New Game" button hint |
+| `useGameSounds` | Sound effects (move, merge, spawn, win, game over) |
 
-При монтировании:
+On mount:
 
-1. `loadState()` — читает `localStorage`.
-2. Восстанавливает размер поля, тему, язык.
-3. `restoreSavedSession()` — продолжает незавершённую партию.
-4. Показывает UI.
+1. `loadState()` — reads `localStorage`.
+2. Restores board size, theme, language, and sound preference.
+3. `restoreSavedSession()` — resumes an unfinished game.
+4. Shows the UI.
 
-### Слоты в `App.vue`
+### Slots in `App.vue`
 
-| Слот | Содержимое по умолчанию |
+| Slot | Default content |
 |---|---|
-| `aim` | `GameAimHeader` — цель и ссылки |
-| `toolbar` | `GameToolbar` — счёт, рекорд, настройки, New Game |
-| `overlay` | `GameOverlay` — «Game over» |
+| `aim` | `GameAimHeader` — goal and links |
+| `toolbar` | `GameToolbar` — score, best, settings, New Game |
+| `overlay` | `GameOverlay` — "Game over" |
 | `board` | `GameBoard` |
 | `awards` | `GameAward` × N |
 | `settings` | `AppSettings` |
+| `copyright` | `AppCopyright` |
 
 ---
 
-## Уровень доски (`GameBoard.vue`)
+## Board layer (`GameBoard.vue`)
 
-| Composable | Назначение |
+| Composable | Purpose |
 |---|---|
-| `useBoardGeometry` | размеры ячеек в % и px |
-| `useBoardChipModel` | Vue-модель плиток (cells, keys, DOM-анимации) |
-| `useBoardInput` | клавиатура + swipe |
-| `useBoardGameLoop` | связь движка с UI, emit-события |
+| `useBoardGeometry` | Cell sizes in % and px |
+| `useBoardChipModel` | Vue tile model (cells, keys, DOM animations) |
+| `useBoardInput` | Keyboard + swipe |
+| `useBoardGameLoop` | Engine ↔ UI bridge, emit events |
 
-Prop **`started`** — главный переключатель:
+The **`started`** prop is the main switch:
 
-- `true` → новая игра (или restore с `skipAutostart`).
-- `false` → отключение input, emit `ended`.
+- `true` → new game (or restore with `skipAutostart`).
+- `false` → disable input, emit `ended`.
 
-### Два слоя состояния доски
+### Two layers of board state
 
-1. **Движок** — числовая матрица `board[][]`, правила слияния и спавна.
-2. **Chip model** — объекты `BoardChip` в `cells[]` для Vue и CSS-анимаций.
+1. **Engine** — numeric `board[][]` matrix, merge and spawn rules.
+2. **Chip model** — `BoardChip` objects in `cells[]` for Vue and CSS animations.
 
-При ходе движок считает moves → chip model переносит плитки в DOM → через `deferred(animationMs)` выполняется merge и spawn.
+On each turn: the engine computes moves → the chip model moves tiles in the DOM → merge and spawn run after `deferred(animationMs)`.
 
 ---
 
-## Движок (`src/lib/game2048.ts`)
+## Engine (`src/lib/game2048.ts`)
 
-Чистый TypeScript-модуль:
+Pure TypeScript module:
 
 ```ts
 const game = createGame2048(size, options)
@@ -209,21 +216,21 @@ game.getSnapshot()   // { board, score }
 game.loadSnapshot(board, score)
 ```
 
-Опции спавна задаются пресетом (`spawnFourProbability`, `spawnValue`).
+Spawn options come from the preset (`spawnFourProbability`, `spawnValue`).
 
 ---
 
-## Система пресетов
+## Preset system
 
-### Где настраивать
+### Where to configure
 
-| Файл | Роль |
+| File | Role |
 |---|---|
-| `src/config/defaultPreset.ts` | значения по умолчанию |
-| `src/config/activePreset.ts` | **ваш** активный пресет |
-| `src/types/game.ts` | TypeScript-интерфейс `GamePreset` |
+| `src/config/defaultPreset.ts` | Default values |
+| `src/config/activePreset.ts` | **Your** active preset |
+| `src/types/game.ts` | TypeScript `GamePreset` interface |
 
-### Пример кастомизации
+### Customization example
 
 ```ts
 // src/config/activePreset.ts
@@ -239,6 +246,7 @@ export const activePreset = createPreset({
   features: {
     awardAnimation: 'none',
     scoreAnimation: 'none',
+    sounds: 'none',
   },
   persistence: {
     storage: 'localStorage',
@@ -247,63 +255,65 @@ export const activePreset = createPreset({
 })
 ```
 
-`createPreset()` делает deep-merge поверх `defaultPreset`.
+`createPreset()` deep-merges on top of `defaultPreset`.
 
-### Ключевые поля пресета
+### Key preset fields
 
 #### `board`
 
-| Поле | Описание |
+| Field | Description |
 |---|---|
-| `defaultSize` | размер поля по умолчанию (4) |
-| `minWidthPx` / `maxWidthPx` | ограничения ширины доски |
-| `horizontalWidthRatio` | доля viewport по ширине |
-| `layoutVerticalPaddingPx` | вертикальные отступы layout |
+| `defaultSize` | Default board size (4) |
+| `minWidthPx` / `maxWidthPx` | Board width constraints |
+| `horizontalWidthRatio` | Viewport width fraction |
+| `layoutVerticalPaddingPx` | Vertical layout padding |
 
 #### `rules`
 
-| Поле | Описание |
+| Field | Description |
 |---|---|
-| `winTileBySize` | цель для каждого размера (4→2048, 5→4096, …) |
-| `spawnsPerMove` | число или `(size) => number` — плиток за ход |
-| `initialSpawns` | число или `(size) => number` — плиток при старте |
-| `spawnFourProbability` | вероятность появления 4 (иначе 2) |
+| `winTileBySize` | Win target per size (4→2048, 5→4096, …) |
+| `spawnsPerMove` | Number or `(size) => number` — tiles spawned per move |
+| `initialSpawns` | Number or `(size) => number` — tiles at game start |
+| `spawnFourProbability` | Probability of spawning 4 (otherwise 2) |
 
-По умолчанию (не классическое 2048): `spawnsPerMove = max(1, size - 3)`, `initialSpawns = max(2, size - 2)`.
+Default (non-classic 2048): `spawnsPerMove = max(1, size - 3)`, `initialSpawns = max(2, size - 2)`.
 
 #### `timing`
 
-| Поле | Описание |
+| Field | Description |
 |---|---|
-| `animationMs` | длительность merge/spawn анимации |
-| `moveMs` | длительность движения плиток |
+| `animationMs` | Merge/spawn animation duration |
+| `moveMs` | Tile movement duration |
 | `moveEasing` | CSS easing (`ease-out`, …) |
 
 #### `features`
 
-| Поле | Описание |
+| Field | Description |
 |---|---|
-| `awards` | показывать блок наград |
-| `bestScorePerSize` | отдельный рекорд для каждого размера |
-| `startGameHint` | пульсация кнопки «Новая игра» |
+| `awards` | Show awards block |
+| `bestScorePerSize` | Separate high score per board size |
+| `startGameHint` | Pulse animation on "New Game" button |
 | `scoreAnimation` | `'gsap'` \| `'none'` |
 | `awardAnimation` | `'fly'` \| `'none'` |
+| `sounds` | `'default'` \| `'none'` — enable or disable sound effects |
+| `soundVolume` | Master volume 0…1 (default `0.6`) |
 
 #### `persistence`
 
-| Поле | Описание |
+| Field | Description |
 |---|---|
 | `storage` | `'localStorage'` \| `'none'` |
-| `key` | ключ в localStorage (по умолчанию `game2048-state`) |
+| `key` | localStorage key (default `game2048-state`) |
 
 #### `input`
 
-| Поле | Описание |
+| Field | Description |
 |---|---|
-| `listenKeysOn` | `'document'` \| `'board'` — где слушать клавиатуру |
-| `swipeSensitivity` | чувствительность свайпа (px) |
+| `listenKeysOn` | `'document'` \| `'board'` — where to listen for keyboard |
+| `swipeSensitivity` | Swipe sensitivity (px) |
 
-### Доступ к пресету в коде
+### Accessing the preset in code
 
 ```ts
 import { useGamePreset } from '@/composables/useGamePreset'
@@ -314,74 +324,92 @@ const { board, timing, features, rules } = preset
 
 ---
 
-## Темы UI
+## UI themes
 
-8 схем в `src/themes/`:
+8 schemes in `src/themes/`:
 
 - `classic`, `classic-dark`
 - `ocean`, `ocean-dark`
 - `forest`, `forest-dark`
 - `sunset`, `sunset-dark`
 
-Переключение: атрибут `data-theme` на `<html>` через `applyUiTheme()` (`src/config/themes.ts`). Выбор — в настройках приложения.
+Switching: `data-theme` attribute on `<html>` via `applyUiTheme()` (`src/config/themes.ts`). Selection is in app settings.
 
-CSS-переменные: `--color-board`, `--color-cell`, `--color-accent`, `--color-text`, …
-
----
-
-## Тема плиток
-
-`src/config/tileThemes/default.ts` — размер шрифта по степени двойки, `getChipStyle(value, sizePx)`.
-
-Цвета плиток — `src/themes/chips.css` (атрибут `data-value` на элементе).
-
-В компонентах: `useTileTheme()`.
+CSS variables: `--color-board`, `--color-cell`, `--color-accent`, `--color-text`, …
 
 ---
 
-## Layout и адаптивность
+## Tile theme
 
-`useBoardLayout(preset, containerRef)` вычисляет CSS-переменные на корне приложения:
+`src/config/tileThemes/default.ts` — font size by power of two, `getChipStyle(value, sizePx)`.
 
-- `--board-size` — адаптивная ширина доски (clamp + viewport)
+Tile colors — `src/themes/chips.css` (`data-value` attribute on the element).
+
+In components: `useTileTheme()`.
+
+---
+
+## Layout and responsiveness
+
+`useBoardLayout(preset, containerRef)` computes CSS variables on the app root:
+
+- `--board-size` — adaptive board width (clamp + viewport)
 - `--toolbar-height`, `--awards-height`
 - `--score-font-size`, `--button-font-size`, …
 
-Пропорции задаются в `preset.layout.ratios` (`src/composables/useBoardLayout.ts` → `defaultLayoutRatios`).
+Ratios are defined in `preset.layout.ratios` (`src/composables/useBoardLayout.ts` → `defaultLayoutRatios`).
 
 ---
 
-## Локализация (i18n)
+## Localization (i18n)
 
-- **Языки:** RU, EN, DE, IT, ES
-- **Файлы:** `src/locales/*.ts`, тип `MessageSchema` в `src/types/messages.ts`
-- **Инициализация:** `src/i18n/index.ts`
+- **Languages:** RU, EN, DE, IT, ES
+- **Files:** `src/locales/*.ts`, `MessageSchema` type in `src/types/messages.ts`
+- **Setup:** `src/i18n/index.ts`
 
-Порядок выбора языка:
+Language selection order:
 
-1. Сохранённый в `localStorage` (из settings)
-2. Язык браузера
+1. Saved in `localStorage` (from settings)
+2. Browser language
 3. Fallback: `en`
 
-В UI языки отображаются как `RU`, `EN`, …
+Languages are shown in the UI as `RU`, `EN`, …
 
-Добавление языка:
+Adding a language:
 
-1. Создать `src/locales/xx.ts` с типом `MessageSchema`.
-2. Добавить locale в `SUPPORTED_LOCALES` и `messages` в `src/i18n/index.ts`.
-3. Расширить тип `LocaleId` в `src/types/game.ts`.
+1. Create `src/locales/xx.ts` with the `MessageSchema` type.
+2. Add the locale to `SUPPORTED_LOCALES` and `messages` in `src/i18n/index.ts`.
+3. Extend the `LocaleId` type in `src/types/game.ts`.
 
 ---
 
-## Сохранение (persistence)
+## Sound effects
 
-Ключ: `game2048-state` (настраивается в пресете).
+Sounds are procedurally generated WAV files in `public/sounds/`, created by `scripts/generate-sounds.mjs` (runs automatically on `prebuild`).
+
+Playback uses the Web Audio API (`src/lib/audio/soundPlayer.ts`) with pitch scaling for merges based on tile value.
+
+| Event | When |
+|---|---|
+| Move | Tiles slide after a valid move |
+| Merge | After merge animation (pitch rises with tile value) |
+| Spawn | New tile appears |
+| Win | Goal tile reached |
+| Game over | No moves left |
+
+Sounds can be disabled in settings (`soundEnabled`) or globally via the preset (`features.sounds: 'none'`). Audio unlocks on the first user gesture (keyboard or swipe) due to browser autoplay policies.
+
+---
+
+## Persistence
+
+Key: `game2048-state` (configurable in the preset).
 
 ```json
 {
   "bestScore": { "4": 1234 },
   "awards": { "2048": { "aim": 2048, "obtained": true } },
-  "settings": { "size": 4, "theme": "classic", "locale": "ru" },
+  "settings": { "size": 4, "theme": "classic", "locale": "ru", "soundEnabled": true },
   "session": {
     "size": 4,
     "score": 512,
@@ -392,30 +420,32 @@ CSS-переменные: `--color-board`, `--color-cell`, `--color-accent`, `--
 }
 ```
 
-| Механизм | Описание |
+| Mechanism | Description |
 |---|---|
-| Debounce 400 ms | отложенная запись при изменениях |
-| `pagehide` / `visibilitychange` | немедленный flush при уходе со страницы |
-| `session-update` | сохранение доски после каждого хода |
-| `isValidGameSession()` | валидация перед restore (`src/lib/gameSession.ts`) |
+| Debounce 400 ms | Deferred write on changes |
+| `pagehide` / `visibilitychange` | Immediate flush when leaving the page |
+| `session-update` | Save board state after each move |
+| `isValidGameSession()` | Validation before restore (`src/lib/gameSession.ts`) |
 
 ---
 
 ## PWA
 
-Настроено в `vite.config.ts` (`vite-plugin-pwa`):
+Configured in `vite.config.ts` (`vite-plugin-pwa`):
 
-- `registerType: 'prompt'` — пользователь решает, когда обновиться
-- Precache статики, offline fallback на `index.html`
-- Иконки: `public/pwa-192x192.png`, `pwa-512x512.png`, `apple-touch-icon.png`
+- `registerType: 'prompt'` — user chooses when to update
+- Precache static assets, offline fallback to `index.html`
+- Icons: `public/pwa-192x192.png`, `pwa-512x512.png`, `apple-touch-icon.png`
+- Audio files included in Workbox precache for offline play
 
-UI обновления: `PwaUpdatePrompt.vue` + `usePwaUpdate`.
+Update UI: `PwaUpdatePrompt.vue` + `usePwaUpdate`.  
+Install hint: `PwaInstallPrompt.vue` + `usePwaInstall`.
 
 ---
 
-## Подмена компонентов
+## Component overrides
 
-### Через пресет
+### Via preset
 
 ```ts
 import MyOverlay from './MyOverlay.vue'
@@ -427,66 +457,73 @@ export const activePreset = createPreset({
 })
 ```
 
-Дефолтные компоненты: `src/config/appComponents.ts`. Резолв: `useAppComponents()`.
+Default components: `src/config/appComponents.ts`. Resolution: `useAppComponents()`.
 
-### Через слоты
+### Via slots
 
-Переопределите слот в обёртке над `App.vue` или форке проекта — см. таблицу слотов выше.
+Override a slot in a wrapper around `App.vue` or in a project fork — see the slots table above.
 
 ---
 
-## Структура проекта
+## Project structure
 
 ```
 src/
 ├── main.ts                    # bootstrap, provide preset
 ├── App.vue                    # layout, slots, useGameController
-├── index.css                  # глобальные стили
-├── env.d.ts                   # типы Vite, Vue, PWA
+├── index.css                  # global styles
+├── env.d.ts                   # Vite, Vue, PWA types
 │
 ├── components/
-│   ├── GameBoard.vue          # доска (geometry + chip + loop)
-│   ├── GameChip.vue           # плитка с анимацией
-│   ├── GameToolbar.vue        # счёт, рекорд, кнопки
-│   ├── GameAimHeader.vue      # цель игры
+│   ├── GameBoard.vue          # board (geometry + chip + loop)
+│   ├── GameChip.vue           # animated tile
+│   ├── GameToolbar.vue        # score, best, buttons
+│   ├── GameAimHeader.vue      # game goal
 │   ├── GameOverlay.vue        # game over
-│   ├── GameAward.vue          # бейдж награды
-│   ├── AppSettings.vue        # модалка настроек
-│   └── PwaUpdatePrompt.vue    # prompt обновления PWA
+│   ├── GameAward.vue          # award badge
+│   ├── AppSettings.vue        # settings modal
+│   ├── AppCopyright.vue       # footer copyright
+│   ├── PwaUpdatePrompt.vue    # PWA update prompt
+│   └── PwaInstallPrompt.vue   # PWA install hint
 │
 ├── composables/
-│   ├── useGameController.ts   # фасад App
-│   ├── useGamePreset.ts       # inject пресета
+│   ├── useGameController.ts   # App facade
+│   ├── useGamePreset.ts       # preset inject
 │   ├── useGameMeta.ts         # awards, bestScore, sizes
 │   ├── useGamePersistence.ts  # localStorage
-│   ├── useAppGameSession.ts   # restore сессии
-│   ├── useScoreDisplay.ts     # счёт + GSAP
-│   ├── useAppSettings.ts      # настройки
-│   ├── useAwards.ts           # награды
+│   ├── useAppGameSession.ts   # session restore
+│   ├── useScoreDisplay.ts     # score + GSAP
+│   ├── useAppSettings.ts      # settings
+│   ├── useAwards.ts           # awards
+│   ├── useGameSounds.ts       # sound effects
 │   ├── useBoardLayout.ts      # CSS layout vars
-│   ├── useBoardGeometry.ts    # геометрия ячеек
-│   ├── useBoardChipModel.ts   # Vue-модель плиток
+│   ├── useBoardGeometry.ts    # cell geometry
+│   ├── useBoardChipModel.ts   # Vue tile model
 │   ├── useBoardInput.ts       # keyboard + swipe
-│   ├── useBoardGameLoop.ts    # игровой цикл доски
-│   ├── useTileTheme.ts        # тема плиток
-│   ├── useAppComponents.ts    # компоненты из пресета
-│   ├── useAwardAnimation.ts   # fly-анимация награды
-│   ├── useStartGameHint.ts    # hint на New Game
-│   └── usePwaUpdate.ts        # PWA update prompt
+│   ├── useBoardGameLoop.ts    # board game loop
+│   ├── useTileTheme.ts        # tile theme
+│   ├── useAppComponents.ts    # preset components
+│   ├── useAwardAnimation.ts   # fly award animation
+│   ├── useStartGameHint.ts    # New Game hint
+│   ├── usePwaUpdate.ts        # PWA update prompt
+│   └── usePwaInstall.ts       # PWA install hint
 │
 ├── config/
-│   ├── activePreset.ts        # ← ваш пресет
+│   ├── activePreset.ts        # ← your preset
 │   ├── defaultPreset.ts       # defaults + createPreset()
 │   ├── themes.ts              # UI themes registry
 │   ├── appComponents.ts       # default components map
 │   ├── injectionKeys.ts       # provide/inject keys
-│   └── tileThemes/default.ts  # стили плиток
+│   └── tileThemes/default.ts  # tile styles
 │
 ├── lib/
-│   ├── game2048.ts            # движок игры
-│   ├── gameSession.ts         # валидация сессии
-│   ├── deferred.ts            # отложенный callback (анимации)
-│   └── swipe.ts                 # swipe listener
+│   ├── game2048.ts            # game engine
+│   ├── gameSession.ts         # session validation
+│   ├── deferred.ts            # deferred callback (animations)
+│   ├── swipe.ts               # swipe listener
+│   └── audio/
+│       ├── soundPlayer.ts     # Web Audio playback
+│       └── soundMap.ts        # sound URLs and merge pitch
 │
 ├── i18n/index.ts
 ├── locales/                   # en, ru, de, it, es
@@ -495,10 +532,17 @@ src/
 │   ├── game.ts                # GamePreset, GameSession, …
 │   ├── messages.ts            # MessageSchema (i18n)
 │   ├── settings.ts            # SettingsSavePayload
-│   └── components.ts          # expose-типы компонентов
+│   └── components.ts          # component expose types
 └── icons.ts                   # Iconify icons
 
-public/                        # favicon, PWA icons
+public/
+├── sounds/                    # procedural WAV assets
+├── favicon, PWA icons
+
+scripts/
+├── generate-pwa-assets.mjs
+└── generate-sounds.mjs
+
 vite.config.ts                 # Vite + PWA
 tsconfig.json                  # TypeScript
 ```
@@ -507,15 +551,15 @@ tsconfig.json                  # TypeScript
 
 ## TypeScript
 
-- Строгий режим: `strict: true`
-- Проверка: `npm run typecheck` (`vue-tsc`)
-- Типы игры: `src/types/game.ts`
+- Strict mode: `strict: true`
+- Check: `npm run typecheck` (`vue-tsc`)
+- Game types: `src/types/game.ts`
 - Vue SFC: `<script setup lang="ts">`
 
-Path alias `@/*` → `src/*` настроен в `tsconfig.json` (опционально для импортов).
+Path alias `@/*` → `src/*` is configured in `tsconfig.json` (optional for imports).
 
 ---
 
-## Лицензия
+## License
 
 [MIT](LICENSE) © 2026 Dmitriy Shalberkin
