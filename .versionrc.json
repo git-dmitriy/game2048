@@ -12,5 +12,5 @@
     { "type": "build", "hidden": true },
     { "type": "ci", "hidden": true }
   ],
-  "releaseCommitMessageFormat": "chore(release): {{currentTag}}"
+  "releaseCommitMessageFormat": "chore(release): v{{currentTag}}"
 }

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-06-16
+## [1.0.0] - 2026-06-18
 
 ### Added
 
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pure game engine (`lib/game2048.ts`) separated from UI
 - Composable-based architecture (`useGameController`, `useBoardGameLoop`, chip model)
 - Eight UI color schemes (classic, ocean, forest, sunset + dark variants)
-- Settings modal: board size, theme, language
+- Settings modal: board size, theme, language, sound on/off
 - Internationalization (RU, EN, DE, IT, ES) via vue-i18n
 - Progressive Web App: install prompt, offline cache, update prompt
 - localStorage persistence: high scores, awards, settings, and active game session
