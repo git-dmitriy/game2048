@@ -5,17 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+
+## [1.1.0](https://github.com/git-dmitriy/game2048/compare/v1.0.0...v1.1.0) (2026-06-18)
+
 
 ### Changed
 
-- Replaced GSAP score animation with native requestAnimationFrame counter
-- Removed THIRD_PARTY_NOTICES.md
-
-### Removed
-
-- gsap dependency
-- `features.scoreAnimation` preset option
+* **legal:** add third-party notices and improve license attribution ([8583713](https://github.com/git-dmitriy/game2048/commit/8583713ddcb58919f7563f03a26a3c98dca4021e))
+* **score:** replace GSAP with rAF counter and remove third-party notices ([9c05efd](https://github.com/git-dmitriy/game2048/commit/9c05efd594ceb2e27b115f52c1dff6a4803d5c2b))
 
 ## [1.0.0] - 2026-06-18
 
