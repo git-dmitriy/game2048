@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: GITHUB_PAGES=true npm run build
+        run: npm run build:gh-pages
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

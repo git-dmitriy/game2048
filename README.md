@@ -432,8 +432,10 @@ Key: `game2048-state` (configurable in the preset).
 The app is published at `https://git-dmitriy.github.io/game2048/` (project site). Build with the correct base path:
 
 ```bash
-GITHUB_PAGES=true npm run build
+npm run build:gh-pages
 ```
+
+Equivalent to `GITHUB_PAGES=true npm run build` (`base: /game2048/`).
 
 Verify before deploy:
 

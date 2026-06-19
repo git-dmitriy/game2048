@@ -78,12 +78,23 @@ export function createSoundPlayer() {
                 console.debug('Sound buffers loaded:', buffers.size)
             }
 
+            if (buffers.size === 0) {
+                if (import.meta.env.DEV) {
+                    console.warn('Sound activation skipped: no buffers loaded')
+                }
+                return
+            }
+
             activated = true
         })()
 
         try {
             await activationPromise
         } catch {
+            activationPromise = null
+        }
+
+        if (!activated) {
             activationPromise = null
         }
     }

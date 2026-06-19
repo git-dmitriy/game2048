@@ -14,7 +14,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "build:gh-pages": "GITHUB_PAGES=true npm run build",
     "preview": "vite preview",
+    "preview:gh-pages": "GITHUB_PAGES=true vite preview",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "generate:pwa-assets": "node scripts/generate-pwa-assets.mjs",
     "generate:sounds": "node scripts/generate-sounds.mjs",
