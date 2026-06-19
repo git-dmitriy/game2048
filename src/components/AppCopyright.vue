@@ -2,6 +2,7 @@
   <footer class="app-copyright">
     <p class="app-copyright-text">
       © {{ year }} Dmitriy Shalberkin ·
+      v{{ version }} ·
       <a
           class="app-copyright-link"
           href="https://github.com/git-dmitriy/game2048/blob/master/LICENSE"
@@ -13,7 +14,10 @@
 </template>
 
 <script setup lang="ts">
+import packageJson from '../../package.json'
+
 const year = new Date().getFullYear()
+const version = packageJson.version
 </script>
 
 <style scoped>
