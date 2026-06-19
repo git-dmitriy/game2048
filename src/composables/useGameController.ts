@@ -68,8 +68,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
     })
 
     const {
-        unlock: unlockSounds,
-        preload: preloadSounds,
+        activate: activateSounds,
         playWin,
         playGameOver,
         playNewGame,
@@ -78,7 +77,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
 
     const {
         showSettings,
-        openSettings,
+        openSettings: openSettingsModal,
         closeSettings,
         onSettingsSave,
     } = useAppSettings({
@@ -126,9 +125,14 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         playAwardAnimation,
     })
 
-    function startGame(): void {
+    function openSettings(): void {
+        void activateSounds()
+        openSettingsModal()
+    }
+
+    async function startGame(): Promise<void> {
         dismissStartHint()
-        unlockSounds()
+        await activateSounds()
         clearSession()
         gameEnded.value = false
         gameAimReached.value = false
@@ -172,7 +176,6 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         appSettings.locale = setAppLocale(appSettings.locale)
         gameAim.value = getWinTile(preset, savedSize)
         applyUiTheme(appSettings.theme)
-        preloadSounds()
         await restoreSavedSession()
         requestAnimationFrame(() => {
             isVisible.value = true
@@ -215,6 +218,6 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         onGameAimReached,
         onSessionUpdate,
         boardSoundCallbacks,
-        unlockSounds,
+        activateSounds,
     }
 }

@@ -1,8 +1,12 @@
+/// <reference types="node" />
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {VitePWA} from 'vite-plugin-pwa'
 
+const base = process.env.GITHUB_PAGES === 'true' ? '/game2048/' : '/'
+
 export default defineConfig({
+    base,
     plugins: [
         vue(),
         VitePWA({
@@ -24,8 +28,6 @@ export default defineConfig({
                 background_color: '#faf8ef',
                 display: 'standalone',
                 orientation: 'portrait',
-                scope: '/',
-                start_url: '/',
                 icons: [
                     {
                         src: 'pwa-192x192.png',

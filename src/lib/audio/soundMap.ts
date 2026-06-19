@@ -1,9 +1,11 @@
+const base = import.meta.env.BASE_URL
+
 export const SOUND_URLS = {
-    move: '/sounds/move.wav',
-    merge: '/sounds/merge.wav',
-    spawn: '/sounds/spawn.wav',
-    win: '/sounds/win.wav',
-    gameOver: '/sounds/game-over.wav',
+    move: `${base}sounds/move.wav`,
+    merge: `${base}sounds/merge.wav`,
+    spawn: `${base}sounds/spawn.wav`,
+    win: `${base}sounds/win.wav`,
+    gameOver: `${base}sounds/game-over.wav`,
 } as const
 
 export type SoundId = keyof typeof SOUND_URLS

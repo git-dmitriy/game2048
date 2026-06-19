@@ -10,7 +10,7 @@ interface SwipeListener {
 }
 
 export function createSwipeListener(
-    onSwipe: (direction: MoveDirection) => void,
+    onSwipe: (direction: MoveDirection) => void | Promise<void>,
     options: SwipeOptions = {},
 ): SwipeListener {
     const sensitivity = options.sensitivity ?? 5
@@ -30,18 +30,17 @@ export function createSwipeListener(
         st = null
     }
 
-    function onEnd(e: TouchEvent) {
+    async function onEnd(e: TouchEvent) {
         if (!st) return
         const t = e.changedTouches[0]
         const dx = t.clientX - st.x
         const dy = t.clientY - st.y
         st = null
         if (Math.abs(dx) < sensitivity && Math.abs(dy) < sensitivity) return
-        if (Math.abs(dx) > Math.abs(dy)) {
-            onSwipe(dx > 0 ? 'right' : 'left')
-        } else {
-            onSwipe(dy > 0 ? 'down' : 'up')
-        }
+        const direction: MoveDirection = Math.abs(dx) > Math.abs(dy)
+            ? (dx > 0 ? 'right' : 'left')
+            : (dy > 0 ? 'down' : 'up')
+        await onSwipe(direction)
     }
 
     return {

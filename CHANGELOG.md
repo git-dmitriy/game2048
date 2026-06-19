@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- iOS Web Audio: activate `AudioContext` and preload sound buffers inside user gestures before playback
+- PWA: check for service worker updates on focus, visibility, and bfcache restore (Android installed apps)
+- Sound asset URLs respect Vite `base` for GitHub Pages project-site deployment
+
+### Changed
+
+- GitHub Pages build uses `GITHUB_PAGES=true` (`base: /game2048/`) with automated deploy workflow
 
 ## [1.1.0](https://github.com/git-dmitriy/game2048/compare/v1.0.0...v1.1.0) (2026-06-18)
 

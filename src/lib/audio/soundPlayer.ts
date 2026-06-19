@@ -11,8 +11,10 @@ export function createSoundPlayer() {
     const buffers = new Map<SoundId, AudioBuffer>()
     let masterVolume = 0.6
     let muted = false
+    let activated = false
+    let activationPromise: Promise<void> | null = null
 
-    function getContext(): AudioContext | null {
+    function initContext(): AudioContext | null {
         if (typeof window === 'undefined') return null
         if (!ctx) {
             ctx = new AudioContext()
@@ -23,30 +25,67 @@ export function createSoundPlayer() {
         return ctx
     }
 
-    async function unlock(): Promise<void> {
-        const audioCtx = getContext()
-        if (!audioCtx) return
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume()
-        }
-    }
-
-    async function preload(urls: Record<SoundId, string> = SOUND_URLS): Promise<void> {
-        const audioCtx = getContext()
-        if (!audioCtx) return
-
+    async function loadBuffers(
+        audioCtx: AudioContext,
+        urls: Record<SoundId, string>,
+    ): Promise<void> {
         await Promise.all(
             (Object.entries(urls) as [SoundId, string][]).map(async ([id, url]) => {
+                if (buffers.has(id)) return
+
                 try {
                     const response = await fetch(url)
-                    if (!response.ok) return
+                    if (!response.ok) {
+                        if (import.meta.env.DEV) {
+                            console.warn(`Sound fetch failed: ${url} (${response.status})`)
+                        }
+                        return
+                    }
                     const arrayBuffer = await response.arrayBuffer()
                     buffers.set(id, await audioCtx.decodeAudioData(arrayBuffer))
-                } catch {
-                    // Game continues without this clip.
+                } catch (error) {
+                    if (import.meta.env.DEV) {
+                        console.warn(`Sound load failed: ${url}`, error)
+                    }
                 }
             }),
         )
+    }
+
+    async function activate(urls: Record<SoundId, string> = SOUND_URLS): Promise<void> {
+        if (activated) return
+        if (activationPromise) return activationPromise
+
+        activationPromise = (async () => {
+            const audioCtx = initContext()
+            if (!audioCtx) return
+
+            if (import.meta.env.DEV) {
+                console.debug('AudioContext state before resume:', audioCtx.state)
+            }
+
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume()
+            }
+
+            if (import.meta.env.DEV) {
+                console.debug('AudioContext state after resume:', audioCtx.state)
+            }
+
+            await loadBuffers(audioCtx, urls)
+
+            if (import.meta.env.DEV) {
+                console.debug('Sound buffers loaded:', buffers.size)
+            }
+
+            activated = true
+        })()
+
+        try {
+            await activationPromise
+        } catch {
+            activationPromise = null
+        }
     }
 
     function setMasterVolume(volume: number): void {
@@ -61,9 +100,9 @@ export function createSoundPlayer() {
     }
 
     function play(id: SoundId, options: PlayOptions = {}): void {
-        if (muted) return
+        if (muted || !activated) return
 
-        const audioCtx = getContext()
+        const audioCtx = ctx
         if (!audioCtx || !masterGain) return
 
         const buffer = buffers.get(id)
@@ -81,8 +120,7 @@ export function createSoundPlayer() {
     }
 
     return {
-        unlock,
-        preload,
+        activate,
         play,
         setMasterVolume,
         setMuted,

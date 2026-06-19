@@ -49,7 +49,7 @@ const props = withDefaults(defineProps<{
   moveEasing?: string
   started?: boolean
   boardSoundCallbacks?: BoardSoundCallbacks
-  onSoundUnlock?: () => void
+  onSoundUnlock?: () => void | Promise<void>
 }>(), {
   listenOwnKeyEventsOnly: false,
   tabIndex: 1,

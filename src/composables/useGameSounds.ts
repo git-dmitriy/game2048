@@ -30,12 +30,9 @@ export function useGameSounds(preset: GamePreset, soundEnabled: Ref<boolean>) {
         && !prefersReducedMotion(),
     )
 
-    function unlock(): void {
-        void player.unlock()
-    }
-
-    function preload(): void {
-        void player.preload(SOUND_URLS)
+    function activate(): Promise<void> {
+        if (!isSoundFeatureEnabled(preset)) return Promise.resolve()
+        return player.activate(SOUND_URLS)
     }
 
     function playMove(): void {
@@ -76,8 +73,7 @@ export function useGameSounds(preset: GamePreset, soundEnabled: Ref<boolean>) {
     }
 
     return {
-        unlock,
-        preload,
+        activate,
         playWin,
         playGameOver,
         playNewGame,
