@@ -69,7 +69,7 @@
               :move-duration-ms="timing.moveMs"
               :move-easing="timing.moveEasing"
               :board-sound-callbacks="boardSoundCallbacks"
-              :on-sound-unlock="unlockSounds"
+              :on-sound-unlock="activateSounds"
               @started="onGameStarted"
               @ended="onGameEnded"
               @score="onGameScore"
@@ -180,7 +180,7 @@ const {
   onGameAimReached,
   onSessionUpdate,
   boardSoundCallbacks,
-  unlockSounds,
+  activateSounds,
 } = useGameController(gameContainerEl)
 </script>
 

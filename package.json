@@ -14,7 +14,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "build:gh-pages": "GITHUB_PAGES=true npm run build",
     "preview": "vite preview",
+    "preview:gh-pages": "GITHUB_PAGES=true vite preview",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "generate:pwa-assets": "node scripts/generate-pwa-assets.mjs",
     "generate:sounds": "node scripts/generate-sounds.mjs",
@@ -32,12 +34,13 @@
   "devDependencies": {
     "@iconify-icons/mdi": "^1.2.48",
     "@iconify-icons/simple-icons": "^1.2.74",
+    "@types/node": "^26.0.0",
     "@vitejs/plugin-vue": "^5.0.0",
     "sharp": "^0.34.2",
+    "standard-version": "^9.5.0",
     "typescript": "^6.0.3",
     "vite": "^5.0.0",
     "vite-plugin-pwa": "^1.3.0",
-    "standard-version": "^9.5.0",
     "vue-tsc": "^2.2.10"
   }
 }
