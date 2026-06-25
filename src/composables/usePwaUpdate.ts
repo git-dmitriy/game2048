@@ -1,5 +1,6 @@
 import {ref, watch} from 'vue'
 import {applyPwaUpdate, pwaNeedRefresh, pwaUpdateInProgress} from '../pwa/register'
+import {invokePwaBeforeReload} from '../pwa/updatePolicy'
 
 export function usePwaUpdate() {
     const dismissed = ref(false)
@@ -21,6 +22,7 @@ export function usePwaUpdate() {
 
         pwaUpdateInProgress.value = true
         dismissed.value = true
+        invokePwaBeforeReload()
 
         try {
             await applyPwaUpdate()
