@@ -447,10 +447,12 @@ GitHub Actions (`.github/workflows/deploy.yml`) runs this build on every push to
 
 ### PWA updates on installed apps
 
-- `registerType: 'prompt'` — the user chooses when to apply an update.
+- `registerType: 'prompt'` — banner during an active game; cold starts without a session apply updates silently.
+- **During play:** bottom banner «Update» / «Later» (`PwaUpdatePrompt.vue`).
+- **After 60 minutes in the background:** pending updates apply automatically on return (state is saved first).
 - A normal page reload may still serve the **old** bundle from the active service worker precache.
 - If the update banner does not appear: fully close the PWA, reopen it, or clear site data in the browser (Chrome → site settings → Clear data).
-- Service worker update checks also run when the app regains focus or becomes visible again.
+- Update detection: `onNeedRefresh`, `updatefound`, `registration.waiting`, focus, visibility, and `pageshow`.
 
 ---
 
@@ -466,7 +468,7 @@ Configured in `vite.config.ts` (`vite-plugin-pwa`):
 Update UI: `PwaUpdatePrompt.vue` + `usePwaUpdate`.  
 Install hint: `PwaInstallPrompt.vue` + `usePwaInstall`.
 
-Service worker update checks run on registration, window focus, and when the page becomes visible again (`src/pwa/register.ts`).
+Combined update policy (`src/pwa/register.ts`, `src/pwa/updatePolicy.ts`): silent apply on cold start, prompt during an active session, forced apply after 60 minutes in the background.
 
 ---
 

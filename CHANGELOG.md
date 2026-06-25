@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- PWA: combined update policy — silent apply on cold start, banner during play, force apply after 60 min in background; detect waiting workers via `updatefound`
 
 ### [1.1.1](https://github.com/git-dmitriy/game2048/compare/v1.1.0...v1.1.1) (2026-06-19)
 

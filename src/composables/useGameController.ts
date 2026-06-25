@@ -16,6 +16,12 @@ import {applyUiTheme, normalizeUiThemeId} from '../config/themes'
 import {detectLocale, setAppLocale} from '../i18n'
 import type {GameSession} from '../types/game'
 import type {GameAimHeaderExpose, GameBoardExpose} from '../types/components'
+import {
+    notifyPwaAppReady,
+    setPwaBeforeReload,
+    setPwaSessionActive,
+    setPwaSettingsOpen,
+} from '../pwa/updatePolicy'
 
 export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
     const preset = useGamePreset()
@@ -168,7 +174,16 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         gameEnded.value = false
     })
 
+    watch(gameStarted, (active) => {
+        setPwaSessionActive(active)
+    })
+
+    watch(showSettings, (open) => {
+        setPwaSettingsOpen(open)
+    })
+
     onMounted(async () => {
+        setPwaBeforeReload(flushPersistState)
         loadState()
         const savedSize = sizes.includes(appSettings.size) ? appSettings.size : defSize
         size.value = savedSize
@@ -177,6 +192,9 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         gameAim.value = getWinTile(preset, savedSize)
         applyUiTheme(appSettings.theme)
         await restoreSavedSession()
+        setPwaSessionActive(gameStarted.value)
+        setPwaSettingsOpen(showSettings.value)
+        notifyPwaAppReady()
         requestAnimationFrame(() => {
             isVisible.value = true
         })
