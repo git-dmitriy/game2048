@@ -1,10 +1,16 @@
 <template>
   <Teleport to="body">
-    <div v-if="visible" class="pwa-install" role="dialog" aria-modal="true" :aria-labelledby="titleId">
+    <div
+        v-if="visible && mode === 'ios'"
+        class="pwa-install pwa-install-ios"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="iosTitleId"
+    >
       <div class="pwa-install-backdrop" @click="dismiss"/>
 
       <div class="pwa-install-dialog" @click.stop>
-        <h2 :id="titleId" class="pwa-install-title">{{ t('pwaInstallTitle') }}</h2>
+        <h2 :id="iosTitleId" class="pwa-install-title">{{ t('pwaInstallTitle') }}</h2>
         <ol class="pwa-install-steps">
           <li>{{ t('pwaInstallStep1') }}</li>
           <li>{{ t('pwaInstallStep2') }}</li>
@@ -12,6 +18,32 @@
         </ol>
         <button type="button" class="pwa-install-button" @click="dismiss">
           {{ t('pwaInstallGotIt') }}
+        </button>
+      </div>
+    </div>
+
+    <div
+        v-else-if="visible && mode === 'chromium'"
+        class="pwa-install-chromium"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="chromiumTitleId"
+    >
+      <h2 :id="chromiumTitleId" class="pwa-install-chromium-title">
+        {{ t('pwaInstallAndroidTitle') }}
+      </h2>
+      <p class="pwa-install-chromium-text">{{ t('pwaInstallAndroidMessage') }}</p>
+      <div class="pwa-install-chromium-actions">
+        <button type="button" class="pwa-install-chromium-button pwa-install-later" @click="dismiss">
+          {{ t('pwaInstallAndroidLater') }}
+        </button>
+        <button
+            type="button"
+            class="pwa-install-chromium-button pwa-install-apply"
+            :disabled="!canInstall"
+            @click="install"
+        >
+          {{ t('pwaInstallAndroidInstall') }}
         </button>
       </div>
     </div>
@@ -23,9 +55,10 @@ import {useI18n} from 'vue-i18n'
 import {usePwaInstall} from '../composables/usePwaInstall'
 
 const {t} = useI18n()
-const {visible, dismiss} = usePwaInstall()
+const {visible, mode, canInstall, dismiss, install} = usePwaInstall()
 
-const titleId = 'pwa-install-title'
+const iosTitleId = 'pwa-install-ios-title'
+const chromiumTitleId = 'pwa-install-chromium-title'
 </script>
 
 <style scoped>
@@ -85,5 +118,67 @@ const titleId = 'pwa-install-title'
   font-weight: bold;
   font-size: calc(var(--button-font-size) * 0.8);
   cursor: pointer;
+}
+
+.pwa-install-chromium {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 905;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(calc(100vw - 2rem), 360px);
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  box-shadow: 0 8px 24px var(--color-shadow);
+  transform: translateX(-50%);
+  animation: dialog-appear-centered var(--motion-modal) var(--motion-ease);
+}
+
+.pwa-install-chromium-title {
+  margin: 0;
+  font-size: calc(var(--button-font-size) * 0.85);
+  font-weight: bold;
+  text-align: center;
+}
+
+.pwa-install-chromium-text {
+  margin: 0;
+  font-size: calc(var(--button-font-size) * 0.75);
+  line-height: 1.35;
+  text-align: center;
+}
+
+.pwa-install-chromium-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pwa-install-chromium-button {
+  flex: 1;
+  min-height: 2.25rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: calc(var(--button-font-size) * 0.75);
+  cursor: pointer;
+}
+
+.pwa-install-later {
+  background-color: var(--color-panel);
+  color: var(--color-text);
+}
+
+.pwa-install-apply {
+  background-color: var(--color-accent);
+  color: var(--color-on-dark);
+}
+
+.pwa-install-apply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

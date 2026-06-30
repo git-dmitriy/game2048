@@ -36,6 +36,10 @@ export interface MessageSchema {
     pwaInstallStep2: string
     pwaInstallStep3: string
     pwaInstallGotIt: string
+    pwaInstallAndroidTitle: string
+    pwaInstallAndroidMessage: string
+    pwaInstallAndroidInstall: string
+    pwaInstallAndroidLater: string
 }
 
 export type ThemeLabelKey =

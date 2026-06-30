@@ -48,8 +48,10 @@ const props = withDefaults(defineProps<{
   moveDurationMs?: number
   moveEasing?: string
   started?: boolean
+  inputPaused?: boolean
   boardSoundCallbacks?: BoardSoundCallbacks
-  onSoundUnlock?: () => void | Promise<void>
+  onAudioUnlock?: () => void
+  onAudioWarmUp?: () => void
 }>(), {
   listenOwnKeyEventsOnly: false,
   tabIndex: 1,
@@ -81,7 +83,9 @@ const boardInput = useBoardInput({
   boardEl,
   listenOwnKeyEventsOnly: toRef(props, 'listenOwnKeyEventsOnly'),
   swipeSensitivity: preset.input.swipeSensitivity,
-  onFirstInteraction: () => props.onSoundUnlock?.(),
+  inputPaused: toRef(props, 'inputPaused'),
+  onAudioUnlock: () => props.onAudioUnlock?.(),
+  onAudioWarmUp: () => props.onAudioWarmUp?.(),
 })
 
 const chipModel = useBoardChipModel({

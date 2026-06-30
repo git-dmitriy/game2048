@@ -36,6 +36,10 @@ const de: MessageSchema = {
     pwaInstallStep2: 'Wählen Sie „Zum Home-Bildschirm“.',
     pwaInstallStep3: 'Tippen Sie auf „Hinzufügen“.',
     pwaInstallGotIt: 'Verstanden',
+    pwaInstallAndroidTitle: '2048 installieren',
+    pwaInstallAndroidMessage: 'Zum Startbildschirm hinzufügen für schnellen Zugriff und Offline-Spiel.',
+    pwaInstallAndroidInstall: 'Installieren',
+    pwaInstallAndroidLater: 'Später',
 }
 
 export default de

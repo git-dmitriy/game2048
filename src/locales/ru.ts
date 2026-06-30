@@ -36,6 +36,10 @@ const ru: MessageSchema = {
     pwaInstallStep2: 'Выберите «На экран Домой».',
     pwaInstallStep3: 'Нажмите «Добавить».',
     pwaInstallGotIt: 'Понятно',
+    pwaInstallAndroidTitle: 'Установить 2048',
+    pwaInstallAndroidMessage: 'Добавьте на главный экран для быстрого доступа и игры офлайн.',
+    pwaInstallAndroidInstall: 'Установить',
+    pwaInstallAndroidLater: 'Позже',
 }
 
 export default ru

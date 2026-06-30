@@ -65,6 +65,23 @@ export function useBoardGameLoop({
 
     let game: Game2048Engine | null = null
     let skipAutostart = false
+    let gameEnded = false
+    let gameOverTimer: ReturnType<typeof setTimeout> | null = null
+
+    function clearGameOverTimer(): void {
+        if (gameOverTimer !== null) {
+            clearTimeout(gameOverTimer)
+            gameOverTimer = null
+        }
+    }
+
+    function scheduleGameOver(): void {
+        if (gameEnded || gameOverTimer !== null) return
+        gameOverTimer = setTimeout(() => {
+            gameOverTimer = null
+            endGame()
+        }, toValue(animationTimeMs))
+    }
 
     function emitSessionUpdate(): void {
         if (!game) return
@@ -118,19 +135,21 @@ export function useBoardGameLoop({
             if (boardChanges.moves.length > 0) {
                 callbacks.onMove?.()
                 moveCooldownUntil = Date.now() + moveDuration
+            } else if (!engine.canMove()) {
+                moveCooldownUntil = Date.now() + moveDuration
             }
             consolidateAndAddChipsDeferred.renew()
             emitSessionUpdate()
 
             if (!engine.canMove()) {
-                setTimeout(() => {
-                    endGame()
-                }, toValue(animationTimeMs))
+                scheduleGameOver()
             }
         }
     }
 
     function startGame(): void {
+        clearGameOverTimer()
+        gameEnded = false
         chipModel.reset()
         game = createGame2048FromPreset(preset, toValue(size))
         chipModel.addChips(game.spawnTiles(getInitialSpawns(preset, toValue(size))))
@@ -158,6 +177,7 @@ export function useBoardGameLoop({
 
         if (interactive) {
             skipAutostart = true
+            gameEnded = false
             boardInput.attach(createGameMove(game))
             callbacks.onStarted()
         }
@@ -167,6 +187,9 @@ export function useBoardGameLoop({
     }
 
     function endGame(): void {
+        if (gameEnded) return
+        gameEnded = true
+        clearGameOverTimer()
         boardInput.detach()
         emitSessionUpdate()
         callbacks.onEnded()

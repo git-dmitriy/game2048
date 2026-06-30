@@ -36,6 +36,10 @@ const en: MessageSchema = {
     pwaInstallStep2: 'Choose "Add to Home Screen".',
     pwaInstallStep3: 'Tap "Add" to confirm.',
     pwaInstallGotIt: 'Got it',
+    pwaInstallAndroidTitle: 'Install 2048',
+    pwaInstallAndroidMessage: 'Add to your home screen for quick access and offline play.',
+    pwaInstallAndroidInstall: 'Install',
+    pwaInstallAndroidLater: 'Later',
 }
 
 export default en
