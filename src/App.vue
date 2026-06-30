@@ -68,6 +68,7 @@
               :animation-time-ms="timing.animationMs"
               :move-duration-ms="timing.moveMs"
               :move-easing="timing.moveEasing"
+              :input-paused="showSettings"
               :board-sound-callbacks="boardSoundCallbacks"
               :on-audio-unlock="unlockSoundsSync"
               :on-audio-warm-up="warmUpSounds"

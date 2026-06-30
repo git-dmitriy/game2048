@@ -48,6 +48,7 @@ const props = withDefaults(defineProps<{
   moveDurationMs?: number
   moveEasing?: string
   started?: boolean
+  inputPaused?: boolean
   boardSoundCallbacks?: BoardSoundCallbacks
   onAudioUnlock?: () => void
   onAudioWarmUp?: () => void
@@ -82,6 +83,7 @@ const boardInput = useBoardInput({
   boardEl,
   listenOwnKeyEventsOnly: toRef(props, 'listenOwnKeyEventsOnly'),
   swipeSensitivity: preset.input.swipeSensitivity,
+  inputPaused: toRef(props, 'inputPaused'),
   onAudioUnlock: () => props.onAudioUnlock?.(),
   onAudioWarmUp: () => props.onAudioWarmUp?.(),
 })
