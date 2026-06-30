@@ -6,3 +6,12 @@ declare module '*.vue' {
     const component: DefineComponent<object, object, unknown>
     export default component
 }
+
+interface BeforeInstallPromptEvent extends Event {
+    prompt(): Promise<void>
+
+    readonly userChoice: Promise<{
+        outcome: 'accepted' | 'dismissed'
+        platform: string
+    }>
+}

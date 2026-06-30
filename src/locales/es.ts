@@ -36,6 +36,10 @@ const es: MessageSchema = {
     pwaInstallStep2: 'Elige "Añadir a inicio".',
     pwaInstallStep3: 'Toca "Añadir" para confirmar.',
     pwaInstallGotIt: 'Entendido',
+    pwaInstallAndroidTitle: 'Instalar 2048',
+    pwaInstallAndroidMessage: 'Añádela a la pantalla de inicio para acceso rápido y juego sin conexión.',
+    pwaInstallAndroidInstall: 'Instalar',
+    pwaInstallAndroidLater: 'Más tarde',
 }
 
 export default es

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* **pwa:** Chromium install prompt via `beforeinstallprompt` (Android and desktop Chrome)
+
 ### Fixed
 
 * **ios:** unlock audio on touchstart without blocking board input; sound independent of reduced motion

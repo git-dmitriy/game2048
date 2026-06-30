@@ -36,6 +36,10 @@ const it: MessageSchema = {
     pwaInstallStep2: 'Scegli "Aggiungi a Home".',
     pwaInstallStep3: 'Tocca "Aggiungi" per confermare.',
     pwaInstallGotIt: 'Capito',
+    pwaInstallAndroidTitle: 'Installa 2048',
+    pwaInstallAndroidMessage: 'Aggiungi alla schermata Home per accesso rapido e gioco offline.',
+    pwaInstallAndroidInstall: 'Installa',
+    pwaInstallAndroidLater: 'Più tardi',
 }
 
 export default it
