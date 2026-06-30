@@ -2,6 +2,7 @@ import type {MoveDirection} from '../types/game'
 
 interface SwipeOptions {
     sensitivity?: number
+    onTouchStart?: () => void
 }
 
 interface SwipeListener {
@@ -10,13 +11,15 @@ interface SwipeListener {
 }
 
 export function createSwipeListener(
-    onSwipe: (direction: MoveDirection) => void | Promise<void>,
+    onSwipe: (direction: MoveDirection) => void,
     options: SwipeOptions = {},
 ): SwipeListener {
     const sensitivity = options.sensitivity ?? 5
+    const onTouchStart = options.onTouchStart
     let st: { x: number; y: number } | null = null
 
     function onStart(e: TouchEvent) {
+        onTouchStart?.()
         const t = e.touches[0]
         st = {x: t.clientX, y: t.clientY}
     }
@@ -30,7 +33,7 @@ export function createSwipeListener(
         st = null
     }
 
-    async function onEnd(e: TouchEvent) {
+    function onEnd(e: TouchEvent) {
         if (!st) return
         const t = e.changedTouches[0]
         const dx = t.clientX - st.x
@@ -40,7 +43,7 @@ export function createSwipeListener(
         const direction: MoveDirection = Math.abs(dx) > Math.abs(dy)
             ? (dx > 0 ? 'right' : 'left')
             : (dy > 0 ? 'down' : 'up')
-        await onSwipe(direction)
+        onSwipe(direction)
     }
 
     return {

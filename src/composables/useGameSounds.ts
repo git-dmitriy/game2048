@@ -9,11 +9,6 @@ export interface BoardSoundCallbacks {
     onSpawn?: (count: number) => void
 }
 
-function prefersReducedMotion(): boolean {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
 function isSoundFeatureEnabled(preset: GamePreset): boolean {
     const policy = preset.features.sounds
     return policy !== 'none' && policy !== false
@@ -26,13 +21,22 @@ export function useGameSounds(preset: GamePreset, soundEnabled: Ref<boolean>) {
 
     const isActive = computed(() =>
         isSoundFeatureEnabled(preset)
-        && soundEnabled.value
-        && !prefersReducedMotion(),
+        && soundEnabled.value,
     )
 
-    function activate(): Promise<void> {
+    function unlockSync(): void {
+        if (!isSoundFeatureEnabled(preset)) return
+        player.unlockSync()
+    }
+
+    function warmUp(): void {
+        if (!isSoundFeatureEnabled(preset)) return
+        void player.warmUp(SOUND_URLS)
+    }
+
+    function warmUpAsync(): Promise<void> {
         if (!isSoundFeatureEnabled(preset)) return Promise.resolve()
-        return player.activate(SOUND_URLS)
+        return player.warmUp(SOUND_URLS)
     }
 
     function playMove(): void {
@@ -73,7 +77,9 @@ export function useGameSounds(preset: GamePreset, soundEnabled: Ref<boolean>) {
     }
 
     return {
-        activate,
+        unlockSync,
+        warmUp,
+        warmUpAsync,
         playWin,
         playGameOver,
         playNewGame,

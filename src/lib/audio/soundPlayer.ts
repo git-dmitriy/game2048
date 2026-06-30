@@ -1,8 +1,19 @@
 import {SOUND_URLS, type SoundId} from './soundMap'
 
+const WARMUP_TIMEOUT_MS = 4000
+
 interface PlayOptions {
     playbackRate?: number
     volume?: number
+}
+
+function warmupWithTimeout(promise: Promise<void>): Promise<void> {
+    return Promise.race([
+        promise,
+        new Promise<void>((resolve) => {
+            setTimeout(resolve, WARMUP_TIMEOUT_MS)
+        }),
+    ])
 }
 
 export function createSoundPlayer() {
@@ -12,7 +23,7 @@ export function createSoundPlayer() {
     let masterVolume = 0.6
     let muted = false
     let activated = false
-    let activationPromise: Promise<void> | null = null
+    let warmUpPromise: Promise<void> | null = null
 
     function initContext(): AudioContext | null {
         if (typeof window === 'undefined') return null
@@ -23,6 +34,23 @@ export function createSoundPlayer() {
             masterGain.gain.value = masterVolume
         }
         return ctx
+    }
+
+    function unlockSync(): void {
+        const audioCtx = initContext()
+        if (!audioCtx) return
+
+        if (import.meta.env.DEV) {
+            console.debug('AudioContext state before resume:', audioCtx.state)
+        }
+
+        if (audioCtx.state === 'suspended') {
+            void audioCtx.resume()
+        }
+
+        if (import.meta.env.DEV) {
+            console.debug('AudioContext resume requested, state:', audioCtx.state)
+        }
     }
 
     async function loadBuffers(
@@ -42,7 +70,8 @@ export function createSoundPlayer() {
                         return
                     }
                     const arrayBuffer = await response.arrayBuffer()
-                    buffers.set(id, await audioCtx.decodeAudioData(arrayBuffer))
+                    const copy = arrayBuffer.slice(0)
+                    buffers.set(id, await audioCtx.decodeAudioData(copy))
                 } catch (error) {
                     if (import.meta.env.DEV) {
                         console.warn(`Sound load failed: ${url}`, error)
@@ -52,25 +81,13 @@ export function createSoundPlayer() {
         )
     }
 
-    async function activate(urls: Record<SoundId, string> = SOUND_URLS): Promise<void> {
+    async function warmUp(urls: Record<SoundId, string> = SOUND_URLS): Promise<void> {
         if (activated) return
-        if (activationPromise) return activationPromise
+        if (warmUpPromise) return warmUpPromise
 
-        activationPromise = (async () => {
+        warmUpPromise = warmupWithTimeout((async () => {
             const audioCtx = initContext()
             if (!audioCtx) return
-
-            if (import.meta.env.DEV) {
-                console.debug('AudioContext state before resume:', audioCtx.state)
-            }
-
-            if (audioCtx.state === 'suspended') {
-                await audioCtx.resume()
-            }
-
-            if (import.meta.env.DEV) {
-                console.debug('AudioContext state after resume:', audioCtx.state)
-            }
 
             await loadBuffers(audioCtx, urls)
 
@@ -80,23 +97,27 @@ export function createSoundPlayer() {
 
             if (buffers.size === 0) {
                 if (import.meta.env.DEV) {
-                    console.warn('Sound activation skipped: no buffers loaded')
+                    console.warn('Sound warm-up skipped: no buffers loaded')
                 }
                 return
             }
 
             activated = true
-        })()
+        })())
 
         try {
-            await activationPromise
+            await warmUpPromise
         } catch {
-            activationPromise = null
+            warmUpPromise = null
         }
 
         if (!activated) {
-            activationPromise = null
+            warmUpPromise = null
         }
+    }
+
+    function isReady(): boolean {
+        return activated && buffers.size > 0
     }
 
     function setMasterVolume(volume: number): void {
@@ -111,13 +132,17 @@ export function createSoundPlayer() {
     }
 
     function play(id: SoundId, options: PlayOptions = {}): void {
-        if (muted || !activated) return
+        if (muted) return
+
+        const buffer = buffers.get(id)
+        if (!buffer) return
 
         const audioCtx = ctx
         if (!audioCtx || !masterGain) return
 
-        const buffer = buffers.get(id)
-        if (!buffer) return
+        if (audioCtx.state === 'suspended') {
+            void audioCtx.resume()
+        }
 
         const source = audioCtx.createBufferSource()
         source.buffer = buffer
@@ -131,7 +156,9 @@ export function createSoundPlayer() {
     }
 
     return {
-        activate,
+        unlockSync,
+        warmUp,
+        isReady,
         play,
         setMasterVolume,
         setMuted,

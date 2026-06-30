@@ -13,35 +13,35 @@ interface BoardInputOptions {
     boardEl: MaybeRefOrGetter<HTMLElement | null>
     listenOwnKeyEventsOnly: MaybeRefOrGetter<boolean>
     swipeSensitivity: number
-    onFirstInteraction?: () => void | Promise<void>
+    onAudioUnlock?: () => void
+    onAudioWarmUp?: () => void
 }
 
 export function useBoardInput({
                                   boardEl,
                                   listenOwnKeyEventsOnly,
                                   swipeSensitivity,
-                                  onFirstInteraction,
+                                  onAudioUnlock,
+                                  onAudioWarmUp,
                               }: BoardInputOptions) {
     let keydownCleanup: (() => void) | null = null
     let swipeDetach: (() => void) | null = null
-    let interactionFired = false
 
-    async function fireFirstInteraction(): Promise<void> {
-        if (interactionFired) return
-        await onFirstInteraction?.()
-        interactionFired = true
+    function prepareAudio(): void {
+        onAudioUnlock?.()
+        onAudioWarmUp?.()
     }
 
     function runKeyboardControl(doGameMove: (direction: MoveDirection) => void): void {
         const listenKeysOn = toValue(listenOwnKeyEventsOnly) ? toValue(boardEl) : document
         if (!listenKeysOn) return
 
-        const handler = async (e: Event) => {
+        const handler = (e: Event) => {
             const ke = e as KeyboardEvent
             const direction = KEY_MAP[ke.keyCode]
             if (direction == null) return
             e.preventDefault()
-            await fireFirstInteraction()
+            prepareAudio()
             doGameMove(direction)
         }
 
@@ -52,11 +52,11 @@ export function useBoardInput({
     }
 
     function runTouchControl(doGameMove: (direction: MoveDirection) => void): void {
-        const swipe = createSwipeListener(async (direction) => {
-            await fireFirstInteraction()
+        const swipe = createSwipeListener((direction) => {
             doGameMove(direction)
         }, {
             sensitivity: swipeSensitivity,
+            onTouchStart: prepareAudio,
         })
         const el = toValue(boardEl)
         if (el) {

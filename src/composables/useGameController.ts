@@ -74,7 +74,8 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
     })
 
     const {
-        activate: activateSounds,
+        unlockSync: unlockSoundsSync,
+        warmUp: warmUpSounds,
         playWin,
         playGameOver,
         playNewGame,
@@ -132,13 +133,15 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
     })
 
     function openSettings(): void {
-        void activateSounds()
+        unlockSoundsSync()
+        void warmUpSounds()
         openSettingsModal()
     }
 
-    async function startGame(): Promise<void> {
+    function startGame(): void {
         dismissStartHint()
-        await activateSounds()
+        unlockSoundsSync()
+        void warmUpSounds()
         clearSession()
         gameEnded.value = false
         gameAimReached.value = false
@@ -236,6 +239,7 @@ export function useGameController(gameContainerEl: Ref<HTMLElement | null>) {
         onGameAimReached,
         onSessionUpdate,
         boardSoundCallbacks,
-        activateSounds,
+        unlockSoundsSync,
+        warmUpSounds,
     }
 }
